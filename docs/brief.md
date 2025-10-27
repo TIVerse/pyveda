@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Status:** Implementation-Ready  
-**Author:** TIVerse Python Team  
+**Authors:** TIVerse Team (@eshanized, @vedanthq)  
 **Last Updated:** October 27, 2025  
 **License:** MIT
 
@@ -1305,7 +1305,7 @@ all = ["pyveda[gpu,telemetry,dev,docs]"]
 Homepage = "https://github.com/TIVerse/pyveda"
 Documentation = "https://pyveda.readthedocs.io"
 Repository = "https://github.com/TIVerse/pyveda"
-Changelog = "https://github.com/TIVerse/pyveda/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/TIVerse/pyveda/blob/master/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/TIVerse/pyveda/issues"
 
 [tool.hatch.build.targets.wheel]
