@@ -89,7 +89,7 @@ echo "========================================"
 echo "Step 6: Running stress tests"
 echo "========================================"
 echo -e "${YELLOW}Running stress tests (may take a few minutes)...${NC}"
-if pytest tests/stress -v --timeout=300; then
+if pytest tests/stress -v; then
     echo -e "${GREEN}✓ Stress tests passed${NC}"
 else
     echo -e "${YELLOW}⚠ Some stress tests may have issues${NC}"

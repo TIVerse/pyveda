@@ -25,7 +25,7 @@ class ExecutorType(Enum):
 
 class FailurePolicy(Enum):
     """Policy for handling task failures."""
-    
+
     FAIL_FAST = "fail_fast"  # Stop on first error
     CONTINUE = "continue"  # Continue execution, collect errors
     RETRY = "retry"  # Retry failed tasks with backoff
@@ -160,15 +160,12 @@ class ConfigBuilder:
         """Set default chunk size for parallel iterators."""
         self._config.chunk_size = size
         return self
-    
+
     def failure_policy(
-        self, 
-        policy: FailurePolicy,
-        max_retries: int = 3,
-        retry_backoff_ms: int = 100
+        self, policy: FailurePolicy, max_retries: int = 3, retry_backoff_ms: int = 100
     ) -> "ConfigBuilder":
         """Set failure handling policy.
-        
+
         Args:
             policy: Failure policy to use
             max_retries: Max retries for RETRY policy

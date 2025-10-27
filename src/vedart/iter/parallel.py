@@ -16,12 +16,12 @@ V = TypeVar("V")
 
 def _process_chunk_with_ops(chunk: list, operations: list, chunk_idx: int) -> tuple:
     """Module-level helper for processing chunks (picklable for multiprocessing).
-    
+
     Args:
         chunk: Data chunk to process
         operations: List of operations to apply
         chunk_idx: Index of this chunk
-        
+
     Returns:
         Tuple of (chunk_idx, processed_result)
     """

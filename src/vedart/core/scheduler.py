@@ -18,7 +18,6 @@ from vedart.core.heuristics import (
     AdaptivePolicy,
     SystemMonitor,
     TaskAnalyzer,
-    create_policy,
 )
 from vedart.core.task import Task
 from vedart.exceptions import SchedulerError
@@ -88,7 +87,7 @@ class AdaptiveScheduler:
         # Track executor state for delta computations
         self._last_executor_counts: dict[ExecutorType, int] = {}
         self._last_snapshot_time = time.time()
-        
+
         # Heuristics components
         self._task_analyzer = TaskAnalyzer()
         self._system_monitor = SystemMonitor()
@@ -204,36 +203,31 @@ class AdaptiveScheduler:
         """
         # Analyze task characteristics
         characteristics = self._task_analyzer.analyze(task)
-        
+
         # Get current system state
         available_executors = {
             executor_type
             for executor_type, executor in self._executors.items()
             if executor.is_available()
         }
-        
-        queue_depths = {
-            executor_type: 0  # TODO: Implement queue depth tracking
-            for executor_type in self._executors.keys()
-        }
-        
-        system_state = self._system_monitor.get_state(
-            available_executors, queue_depths
-        )
-        
+
+        queue_depths = dict.fromkeys(self._executors.keys(), 0)
+
+        system_state = self._system_monitor.get_state(available_executors, queue_depths)
+
         # Use policy to select executor
         selected_type = self._policy.select_executor(
             task, characteristics, system_state
         )
-        
+
         if selected_type:
             return self._executors.get(selected_type)
-        
+
         # Fallback: any available executor
         for executor in self._executors.values():
             if executor.is_available():
                 return executor
-        
+
         return None
 
     def _adaptation_loop(self) -> None:

@@ -11,13 +11,14 @@ def test_gpu_runtime_initialization():
     runtime = veda.get_runtime()
 
     # GPU may or may not be available depending on hardware
-    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
+    if hasattr(runtime, "gpu") and runtime.gpu and runtime.gpu.is_available():
         assert runtime.gpu.backend in ["cupy", "numba", "torch"]
         assert runtime.gpu.device_count > 0
 
 
 def test_gpu_decorator_fallback():
     """Test GPU decorator falls back to CPU when GPU unavailable."""
+
     @veda.gpu
     def simple_computation(x):
         return x**2
@@ -31,7 +32,7 @@ def test_gpu_memory_stats():
     """Test GPU memory statistics retrieval."""
     runtime = veda.get_runtime()
 
-    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
+    if hasattr(runtime, "gpu") and runtime.gpu and runtime.gpu.is_available():
         stats = runtime.gpu.get_memory_stats()
 
         assert "used_mb" in stats
@@ -47,7 +48,7 @@ def test_gpu_executor_registration():
     """Test GPU executor is registered when available."""
     runtime = veda.get_runtime()
 
-    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
+    if hasattr(runtime, "gpu") and runtime.gpu and runtime.gpu.is_available():
         from vedart.config import ExecutorType
 
         # GPU executor should be registered
