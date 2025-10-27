@@ -23,6 +23,15 @@ class ExecutorType(Enum):
     GPU = "gpu"
 
 
+class FailurePolicy(Enum):
+    """Policy for handling task failures."""
+    
+    FAIL_FAST = "fail_fast"  # Stop on first error
+    CONTINUE = "continue"  # Continue execution, collect errors
+    RETRY = "retry"  # Retry failed tasks with backoff
+    IGNORE = "ignore"  # Ignore errors, skip failed tasks
+
+
 @dataclass
 class Config:
     """Runtime configuration for VedaRT.
@@ -56,6 +65,9 @@ class Config:
     chunk_size: int | None = None
     gpu_threshold_bytes: int = 1024 * 1024  # 1MB
     cpu_threshold_percent: float = 70.0
+    failure_policy: FailurePolicy = FailurePolicy.FAIL_FAST
+    max_retries: int = 3  # Max retries for RETRY policy
+    retry_backoff_ms: int = 100  # Initial backoff for retries
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -147,6 +159,24 @@ class ConfigBuilder:
     def chunk_size(self, size: int) -> "ConfigBuilder":
         """Set default chunk size for parallel iterators."""
         self._config.chunk_size = size
+        return self
+    
+    def failure_policy(
+        self, 
+        policy: FailurePolicy,
+        max_retries: int = 3,
+        retry_backoff_ms: int = 100
+    ) -> "ConfigBuilder":
+        """Set failure handling policy.
+        
+        Args:
+            policy: Failure policy to use
+            max_retries: Max retries for RETRY policy
+            retry_backoff_ms: Initial backoff for retries
+        """
+        self._config.failure_policy = policy
+        self._config.max_retries = max_retries
+        self._config.retry_backoff_ms = retry_backoff_ms
         return self
 
     def build(self) -> Config:

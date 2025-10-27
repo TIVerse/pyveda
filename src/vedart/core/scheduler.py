@@ -14,6 +14,12 @@ import psutil
 
 from vedart.config import Config, ExecutorType, SchedulingPolicy
 from vedart.core.executor import BaseExecutor
+from vedart.core.heuristics import (
+    AdaptivePolicy,
+    SystemMonitor,
+    TaskAnalyzer,
+    create_policy,
+)
 from vedart.core.task import Task
 from vedart.exceptions import SchedulerError
 
@@ -82,6 +88,11 @@ class AdaptiveScheduler:
         # Track executor state for delta computations
         self._last_executor_counts: dict[ExecutorType, int] = {}
         self._last_snapshot_time = time.time()
+        
+        # Heuristics components
+        self._task_analyzer = TaskAnalyzer()
+        self._system_monitor = SystemMonitor()
+        self._policy = AdaptivePolicy(cpu_threshold=config.cpu_threshold_percent)
 
     def register_executor(
         self, executor_type: ExecutorType, executor: BaseExecutor
@@ -191,46 +202,38 @@ class AdaptiveScheduler:
         Returns:
             Selected executor
         """
-        # Priority 1: GPU if enabled and beneficial
-        gpu_executor = self._executors.get(ExecutorType.GPU)
-        if gpu_executor and gpu_executor.is_available():
-            # Check if GPU offload would be beneficial using GPU runtime
-            # For now, rely on @gpu decorator marking, but could enhance with heuristics
-            # based on task args size estimation
-            try:
-                from vedart.core.runtime import get_runtime
-
-                runtime = get_runtime()
-                if runtime.gpu and runtime.gpu.should_offload(task.func, task.args):
-                    return gpu_executor
-            except Exception as e:
-                logger.debug(f"GPU eligibility check failed: {e}")
-
-        # Priority 2: Async if task is coroutine
-        if task.is_async:
-            async_executor = self._executors.get(ExecutorType.ASYNC)
-            if async_executor and async_executor.is_available():
-                return async_executor
-
-        # Priority 3: Choose between thread and process based on CPU load
-        thread_executor = self._executors.get(ExecutorType.THREAD)
-        process_executor = self._executors.get(ExecutorType.PROCESS)
-
-        # Use threads for low CPU load or I/O-bound tasks
-        # Use processes for high CPU load
-        if self._cpu_percent < self.config.cpu_threshold_percent:
-            if thread_executor and thread_executor.is_available():
-                return thread_executor
-
-        # Fallback to processes for CPU-bound work
-        if process_executor and process_executor.is_available():
-            return process_executor
-
-        # Final fallback to any available executor
+        # Analyze task characteristics
+        characteristics = self._task_analyzer.analyze(task)
+        
+        # Get current system state
+        available_executors = {
+            executor_type
+            for executor_type, executor in self._executors.items()
+            if executor.is_available()
+        }
+        
+        queue_depths = {
+            executor_type: 0  # TODO: Implement queue depth tracking
+            for executor_type in self._executors.keys()
+        }
+        
+        system_state = self._system_monitor.get_state(
+            available_executors, queue_depths
+        )
+        
+        # Use policy to select executor
+        selected_type = self._policy.select_executor(
+            task, characteristics, system_state
+        )
+        
+        if selected_type:
+            return self._executors.get(selected_type)
+        
+        # Fallback: any available executor
         for executor in self._executors.values():
             if executor.is_available():
                 return executor
-
+        
         return None
 
     def _adaptation_loop(self) -> None:

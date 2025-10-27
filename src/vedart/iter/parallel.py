@@ -14,6 +14,23 @@ U = TypeVar("U")
 V = TypeVar("V")
 
 
+def _process_chunk_with_ops(chunk: list, operations: list, chunk_idx: int) -> tuple:
+    """Module-level helper for processing chunks (picklable for multiprocessing).
+    
+    Args:
+        chunk: Data chunk to process
+        operations: List of operations to apply
+        chunk_idx: Index of this chunk
+        
+    Returns:
+        Tuple of (chunk_idx, processed_result)
+    """
+    result = chunk
+    for op in operations:
+        result = op.apply(result)
+    return (chunk_idx, result)
+
+
 class Operation:
     """Base class for iterator operations."""
 
@@ -282,19 +299,12 @@ class ParallelIterator(Generic[T]):
         chunk_size = self._chunk_size or self._auto_chunk_size(len(items))
         chunks = self._chunk_iterable(items, chunk_size)
 
-        # Process chunks in parallel
-        def process_chunk(chunk: list[T], chunk_idx: int) -> tuple[int, list[T]]:
-            result = chunk
-            for op in self._operations:
-                result = op.apply(result)
-            return (chunk_idx, result)
-
-        # Submit tasks
+        # Submit tasks (using module-level function for picklability)
         futures = []
         for idx, chunk in enumerate(chunks):
             task = Task(
-                func=process_chunk,
-                args=(chunk, idx),
+                func=_process_chunk_with_ops,
+                args=(chunk, self._operations, idx),
                 kwargs={},
             )
             future = runtime.scheduler.submit(task)

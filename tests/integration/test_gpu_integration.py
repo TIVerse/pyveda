@@ -7,24 +7,17 @@ import vedart as veda
 
 def test_gpu_runtime_initialization():
     """Test GPU runtime initialization."""
-    config = veda.Config.builder().gpu(True).build()
-    veda.init(config)
-
+    # Runtime is already initialized in test environment
     runtime = veda.get_runtime()
 
     # GPU may or may not be available depending on hardware
-    if runtime.gpu and runtime.gpu.is_available():
-        assert runtime.gpu.backend in ["cupy", "numba"]
+    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
+        assert runtime.gpu.backend in ["cupy", "numba", "torch"]
         assert runtime.gpu.device_count > 0
-
-    veda.shutdown()
 
 
 def test_gpu_decorator_fallback():
     """Test GPU decorator falls back to CPU when GPU unavailable."""
-    config = veda.Config.builder().gpu(True).build()
-    veda.init(config)
-
     @veda.gpu
     def simple_computation(x):
         return x**2
@@ -33,17 +26,12 @@ def test_gpu_decorator_fallback():
     result = simple_computation(5)
     assert result == 25
 
-    veda.shutdown()
-
 
 def test_gpu_memory_stats():
     """Test GPU memory statistics retrieval."""
-    config = veda.Config.builder().gpu(True).build()
-    veda.init(config)
-
     runtime = veda.get_runtime()
 
-    if runtime.gpu and runtime.gpu.is_available():
+    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
         stats = runtime.gpu.get_memory_stats()
 
         assert "used_mb" in stats
@@ -54,17 +42,12 @@ def test_gpu_memory_stats():
         utilization = runtime.gpu.get_utilization()
         assert 0 <= utilization <= 100
 
-    veda.shutdown()
-
 
 def test_gpu_executor_registration():
     """Test GPU executor is registered when available."""
-    config = veda.Config.builder().gpu(True).build()
-    veda.init(config)
-
     runtime = veda.get_runtime()
 
-    if runtime.gpu and runtime.gpu.is_available():
+    if hasattr(runtime, 'gpu') and runtime.gpu and runtime.gpu.is_available():
         from vedart.config import ExecutorType
 
         # GPU executor should be registered
@@ -72,17 +55,12 @@ def test_gpu_executor_registration():
         assert gpu_executor is not None
         assert gpu_executor.is_available()
 
-    veda.shutdown()
-
 
 @pytest.mark.skipif(not hasattr(veda, "gpu"), reason="GPU support not available")
 def test_gpu_with_iterator():
     """Test GPU integration with parallel iterator."""
     pytest.importorskip("numpy")
     import numpy as np
-
-    config = veda.Config.builder().gpu(True).build()
-    veda.init(config)
 
     @veda.gpu
     def square_array(arr):
@@ -94,5 +72,3 @@ def test_gpu_with_iterator():
 
     assert len(results) == 2
     assert all(isinstance(r, np.ndarray) for r in results)
-
-    veda.shutdown()
