@@ -3,8 +3,10 @@
 import logging
 import os
 import threading
-from concurrent.futures import Future, ProcessPoolExecutor as StdProcessPoolExecutor
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from concurrent.futures import Future
+from concurrent.futures import ProcessPoolExecutor as StdProcessPoolExecutor
+from typing import Any
 
 from pyveda.core.executor import BaseExecutor
 from pyveda.core.task import Task
@@ -12,16 +14,18 @@ from pyveda.core.task import Task
 logger = logging.getLogger(__name__)
 
 
-def _execute_task_func(func: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
+def _execute_task_func(
+    func: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> Any:
     """Module-level function to execute task in subprocess.
-    
+
     This needs to be at module level to be picklable.
-    
+
     Args:
         func: Function to execute
         args: Positional arguments
         kwargs: Keyword arguments
-        
+
     Returns:
         Function result
     """
@@ -30,17 +34,17 @@ def _execute_task_func(func: Callable[..., Any], args: tuple[Any, ...], kwargs: 
 
 class ProcessPoolExecutor(BaseExecutor):
     """Executor using process pool for CPU-bound tasks.
-    
+
     Wraps Python's ProcessPoolExecutor for true parallelism.
     """
 
     def __init__(
         self,
-        max_workers: Optional[int] = None,
+        max_workers: int | None = None,
         name: str = "process-pool",
     ) -> None:
         """Initialize process pool executor.
-        
+
         Args:
             max_workers: Maximum number of processes (None = cpu_count)
             name: Executor name for logging
@@ -60,10 +64,10 @@ class ProcessPoolExecutor(BaseExecutor):
 
     def submit(self, task: Task) -> Future[Any]:
         """Submit a task for execution.
-        
+
         Args:
             task: Task to execute
-            
+
         Returns:
             Future for the result
         """
@@ -75,7 +79,7 @@ class ProcessPoolExecutor(BaseExecutor):
 
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the executor.
-        
+
         Args:
             wait: If True, wait for pending tasks
         """
@@ -87,7 +91,7 @@ class ProcessPoolExecutor(BaseExecutor):
 
     def is_available(self) -> bool:
         """Check if executor is available.
-        
+
         Returns:
             True if not shutdown
         """
@@ -95,11 +99,11 @@ class ProcessPoolExecutor(BaseExecutor):
 
     def scale(self, num_workers: int) -> None:
         """Scale the process pool.
-        
+
         Note: ProcessPoolExecutor doesn't support dynamic scaling,
         so this is a no-op. A production implementation could
         recreate the pool.
-        
+
         Args:
             num_workers: Desired worker count
         """
@@ -108,5 +112,7 @@ class ProcessPoolExecutor(BaseExecutor):
 
         # ProcessPoolExecutor doesn't support resizing
         # Production implementation would recreate pool
-        logger.debug(f"Process pool scaling requested to {num_workers} (not implemented)")
+        logger.debug(
+            f"Process pool scaling requested to {num_workers} (not implemented)"
+        )
         self._current_workers = num_workers

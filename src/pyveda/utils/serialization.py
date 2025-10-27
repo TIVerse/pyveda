@@ -6,10 +6,10 @@ from typing import Any
 
 def is_picklable(obj: Any) -> bool:
     """Check if an object can be pickled.
-    
+
     Args:
         obj: Object to test
-    
+
     Returns:
         True if picklable
     """

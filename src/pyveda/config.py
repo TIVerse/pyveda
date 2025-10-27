@@ -1,9 +1,7 @@
 """Configuration management for PyVeda runtime."""
 
-import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class SchedulingPolicy(Enum):
@@ -28,7 +26,7 @@ class ExecutorType(Enum):
 @dataclass
 class Config:
     """Runtime configuration for PyVeda.
-    
+
     Attributes:
         num_threads: Number of threads (None = cpu_count())
         num_processes: Number of processes (None = physical cores)
@@ -45,17 +43,17 @@ class Config:
         cpu_threshold_percent: CPU usage threshold for process fallback
     """
 
-    num_threads: Optional[int] = None
-    num_processes: Optional[int] = None
+    num_threads: int | None = None
+    num_processes: int | None = None
     scheduling_policy: SchedulingPolicy = SchedulingPolicy.ADAPTIVE
     enable_gpu: bool = False
     enable_telemetry: bool = True
-    deterministic_seed: Optional[int] = None
+    deterministic_seed: int | None = None
     task_queue_size: int = 10000
     adaptive_interval_ms: int = 100
     min_workers: int = 1
-    max_workers: Optional[int] = None
-    chunk_size: Optional[int] = None
+    max_workers: int | None = None
+    chunk_size: int | None = None
     gpu_threshold_bytes: int = 1024 * 1024  # 1MB
     cpu_threshold_percent: float = 70.0
 
@@ -77,7 +75,7 @@ class Config:
     @staticmethod
     def builder() -> "ConfigBuilder":
         """Create a builder for fluent configuration.
-        
+
         Returns:
             New ConfigBuilder instance
         """
@@ -86,7 +84,7 @@ class Config:
     @staticmethod
     def default() -> "Config":
         """Create default configuration.
-        
+
         Returns:
             Config with default values
         """
@@ -153,7 +151,7 @@ class ConfigBuilder:
 
     def build(self) -> Config:
         """Build the configuration.
-        
+
         Returns:
             Configured Config instance
         """

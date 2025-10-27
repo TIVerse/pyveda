@@ -2,9 +2,10 @@
 
 import json
 import logging
+from collections.abc import Generator
 from contextlib import contextmanager
-from dataclasses import dataclass, asdict
-from typing import Any, Generator, List, Optional
+from dataclasses import asdict, dataclass
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,26 +22,26 @@ class TaskScheduledEvent:
 
 class ExecutionTrace:
     """Records execution events for replay.
-    
+
     Captures scheduling decisions and task execution
     order for deterministic replay.
     """
 
     def __init__(self) -> None:
         """Initialize execution trace."""
-        self.events: List[TaskScheduledEvent] = []
+        self.events: list[TaskScheduledEvent] = []
 
     def record(self, event: TaskScheduledEvent) -> None:
         """Record an event.
-        
+
         Args:
             event: Event to record
         """
         self.events.append(event)
 
-    def get_events(self) -> List[TaskScheduledEvent]:
+    def get_events(self) -> list[TaskScheduledEvent]:
         """Get all recorded events.
-        
+
         Returns:
             List of events
         """
@@ -52,66 +53,68 @@ class ExecutionTrace:
 
     def save_to_file(self, filepath: str) -> None:
         """Save trace to JSON file.
-        
+
         Args:
             filepath: Path to save trace
         """
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             data = [asdict(event) for event in self.events]
             json.dump(data, f, indent=2)
         logger.info(f"Trace saved to {filepath}")
 
     def load_from_file(self, filepath: str) -> None:
         """Load trace from JSON file.
-        
+
         Args:
             filepath: Path to load trace from
         """
-        with open(filepath, 'r') as f:
+        with open(filepath) as f:
             data = json.load(f)
             self.events = [TaskScheduledEvent(**event) for event in data]
         logger.info(f"Trace loaded from {filepath} ({len(self.events)} events)")
 
     def to_dict(self) -> dict[str, Any]:
         """Export trace as dictionary.
-        
+
         Returns:
             Dictionary representation
         """
         return {
-            'events': [asdict(event) for event in self.events],
-            'event_count': len(self.events)
+            "events": [asdict(event) for event in self.events],
+            "event_count": len(self.events),
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> 'ExecutionTrace':
+    def from_dict(cls, data: dict[str, Any]) -> "ExecutionTrace":
         """Create trace from dictionary.
-        
+
         Args:
             data: Dictionary with trace data
-            
+
         Returns:
             ExecutionTrace instance
         """
         trace = cls()
-        trace.events = [TaskScheduledEvent(**event) for event in data.get('events', [])]
+        trace.events = [TaskScheduledEvent(**event) for event in data.get("events", [])]
         return trace
 
 
 @contextmanager
-def deterministic(seed: int, record: bool = False) -> Generator[Optional[ExecutionTrace], None, None]:
+def deterministic(
+    seed: int, record: bool = False
+) -> Generator[ExecutionTrace | None, None, None]:
     """Context manager for deterministic execution.
-    
+
     Ensures reproducible execution by seeding the scheduler
     and using deterministic scheduling.
-    
+
     Args:
         seed: Random seed
         record: Whether to record execution trace
-        
+
     Yields:
         ExecutionTrace if recording, else None
-        
+
     Example:
         with deterministic(seed=42) as trace:
             result = compute_flaky_operation()
@@ -151,4 +154,6 @@ def deterministic(seed: int, record: bool = False) -> Generator[Optional[Executi
         det_scheduler.shutdown()
         runtime.scheduler = old_scheduler
 
-        logger.info(f"Deterministic execution completed ({det_scheduler.logical_clock} tasks)")
+        logger.info(
+            f"Deterministic execution completed ({det_scheduler.logical_clock} tasks)"
+        )

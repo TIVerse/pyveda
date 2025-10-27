@@ -7,8 +7,8 @@ import time
 from collections import defaultdict
 from concurrent.futures import Future
 from dataclasses import dataclass, field
-from queue import Empty, PriorityQueue
-from typing import Any, Dict, Optional
+from queue import PriorityQueue
+from typing import Any
 
 import psutil
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ExecutorStats:
     """Statistics for an executor.
-    
+
     Tracks metrics for adaptive scheduling decisions.
     """
 
@@ -53,39 +53,41 @@ class ExecutorStats:
 
 class AdaptiveScheduler:
     """Adaptive scheduler that selects executors and scales workers.
-    
+
     Uses heuristics and system metrics to choose the best executor
     for each task and dynamically adjust worker counts.
     """
 
     def __init__(self, config: Config) -> None:
         """Initialize scheduler.
-        
+
         Args:
             config: Runtime configuration
         """
         self.config = config
-        self._executors: Dict[ExecutorType, BaseExecutor] = {}
-        self._stats: Dict[ExecutorType, ExecutorStats] = defaultdict(ExecutorStats)
+        self._executors: dict[ExecutorType, BaseExecutor] = {}
+        self._stats: dict[ExecutorType, ExecutorStats] = defaultdict(ExecutorStats)
         self._task_queue: PriorityQueue[Task] = PriorityQueue(
             maxsize=config.task_queue_size
         )
         self._running = False
-        self._adaptation_thread: Optional[threading.Thread] = None
+        self._adaptation_thread: threading.Thread | None = None
         self._lock = threading.Lock()
 
         # Cached system metrics (updated periodically)
         self._cpu_percent = 0.0
         self._memory_percent = 0.0
         self._last_metrics_update = 0.0
-        
+
         # Track executor state for delta computations
-        self._last_executor_counts: Dict[ExecutorType, int] = {}
+        self._last_executor_counts: dict[ExecutorType, int] = {}
         self._last_snapshot_time = time.time()
 
-    def register_executor(self, executor_type: ExecutorType, executor: BaseExecutor) -> None:
+    def register_executor(
+        self, executor_type: ExecutorType, executor: BaseExecutor
+    ) -> None:
         """Register an executor with the scheduler.
-        
+
         Args:
             executor_type: Type of executor
             executor: Executor instance
@@ -118,13 +120,13 @@ class AdaptiveScheduler:
 
     def submit(self, task: Task) -> Future[Any]:
         """Submit a task for execution.
-        
+
         Args:
             task: Task to execute
-            
+
         Returns:
             Future for the result
-            
+
         Raises:
             SchedulerError: If no suitable executor available
         """
@@ -157,12 +159,12 @@ class AdaptiveScheduler:
         future.add_done_callback(record_completion)
         return future
 
-    def _select_executor(self, task: Task) -> Optional[BaseExecutor]:
+    def _select_executor(self, task: Task) -> BaseExecutor | None:
         """Select the best executor for a task.
-        
+
         Args:
             task: Task to schedule
-            
+
         Returns:
             Selected executor or None
         """
@@ -180,12 +182,12 @@ class AdaptiveScheduler:
         # Adaptive selection
         return self._adaptive_select(task)
 
-    def _adaptive_select(self, task: Task) -> Optional[BaseExecutor]:
+    def _adaptive_select(self, task: Task) -> BaseExecutor | None:
         """Adaptively select executor based on task and system state.
-        
+
         Args:
             task: Task to schedule
-            
+
         Returns:
             Selected executor
         """
@@ -197,6 +199,7 @@ class AdaptiveScheduler:
             # based on task args size estimation
             try:
                 from pyveda.core.runtime import get_runtime
+
                 runtime = get_runtime()
                 if runtime.gpu and runtime.gpu.should_offload(task.func, task.args):
                     return gpu_executor
@@ -243,10 +246,10 @@ class AdaptiveScheduler:
         """Adapt worker counts using Little's Law."""
         now = time.time()
         time_delta = now - self._last_snapshot_time
-        
+
         if time_delta < 0.001:  # Avoid division by zero
             return
-        
+
         for executor_type, executor in self._executors.items():
             stats = self._stats[executor_type]
 
@@ -282,10 +285,10 @@ class AdaptiveScheduler:
                 logger.debug(f"Scaled {executor_type.value} to {optimal} workers")
             except Exception as e:
                 logger.warning(f"Failed to scale {executor_type.value}: {e}")
-            
+
             # Update last count
             self._last_executor_counts[executor_type] = stats.tasks_executed
-        
+
         # Update last snapshot time
         self._last_snapshot_time = now
 
@@ -303,16 +306,16 @@ class AdaptiveScheduler:
         except Exception as e:
             logger.warning(f"Failed to update metrics: {e}")
 
-    def _get_executor_type(self, executor: BaseExecutor) -> Optional[ExecutorType]:
+    def _get_executor_type(self, executor: BaseExecutor) -> ExecutorType | None:
         """Get the type of an executor."""
         for executor_type, ex in self._executors.items():
             if ex is executor:
                 return executor_type
         return None
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get scheduler statistics.
-        
+
         Returns:
             Dictionary of statistics
         """

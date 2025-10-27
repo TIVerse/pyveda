@@ -1,7 +1,5 @@
 """Tests for parallel iterators."""
 
-import pytest
-
 from pyveda.iter.parallel import par_iter
 
 
@@ -19,12 +17,7 @@ def test_par_iter_filter(cleanup_runtime):
 
 def test_par_iter_map_filter_chain(cleanup_runtime):
     """Test chaining map and filter."""
-    result = (
-        par_iter(range(10))
-        .map(lambda x: x * 2)
-        .filter(lambda x: x > 10)
-        .collect()
-    )
+    result = par_iter(range(10)).map(lambda x: x * 2).filter(lambda x: x > 10).collect()
     assert result == [12, 14, 16, 18]
 
 
@@ -56,7 +49,7 @@ def test_par_iter_empty(cleanup_runtime):
     """Test parallel operations on empty iterable."""
     result = par_iter([]).collect()
     assert result == []
-    
+
     result = par_iter([]).sum()
     assert result == 0
 

@@ -4,7 +4,7 @@ import asyncio
 import logging
 import threading
 from concurrent.futures import Future as StdFuture
-from typing import Any, Optional
+from typing import Any
 
 from pyveda.core.executor import BaseExecutor
 from pyveda.core.task import Task
@@ -14,21 +14,21 @@ logger = logging.getLogger(__name__)
 
 class AsyncIOExecutor(BaseExecutor):
     """Executor for async/await coroutines.
-    
+
     Runs an event loop in a dedicated thread and bridges
     to concurrent.futures.Future for synchronous API.
     """
 
     def __init__(self, name: str = "async-executor") -> None:
         """Initialize async executor.
-        
+
         Args:
             name: Executor name for logging
         """
         super().__init__(name)
 
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
-        self._thread: Optional[threading.Thread] = None
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread: threading.Thread | None = None
         self._started = threading.Event()
 
         # Start event loop in background thread
@@ -45,16 +45,18 @@ class AsyncIOExecutor(BaseExecutor):
             self._started.set()
             self._loop.run_forever()
 
-        self._thread = threading.Thread(target=run_loop, daemon=True, name="veda-asyncio")
+        self._thread = threading.Thread(
+            target=run_loop, daemon=True, name="veda-asyncio"
+        )
         self._thread.start()
         self._started.wait()  # Wait for loop to be ready
 
     def submit(self, task: Task) -> StdFuture[Any]:
         """Submit a task for execution.
-        
+
         Args:
             task: Task to execute (must be async)
-            
+
         Returns:
             Future for the result
         """
@@ -68,11 +70,11 @@ class AsyncIOExecutor(BaseExecutor):
             try:
                 # Execute the function (handle both sync and async)
                 result = task.func(*task.args, **task.kwargs)
-                
+
                 # Check if result is awaitable (coroutine)
                 if hasattr(result, "__await__"):
                     result = await result
-                
+
                 future.set_result(result)
             except Exception as e:
                 future.set_exception(e)
@@ -84,7 +86,7 @@ class AsyncIOExecutor(BaseExecutor):
 
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the executor.
-        
+
         Args:
             wait: If True, wait for pending tasks
         """
@@ -103,7 +105,7 @@ class AsyncIOExecutor(BaseExecutor):
 
     def is_available(self) -> bool:
         """Check if executor is available.
-        
+
         Returns:
             True if loop is running
         """
@@ -111,10 +113,10 @@ class AsyncIOExecutor(BaseExecutor):
 
     def scale(self, num_workers: int) -> None:
         """Scale the executor.
-        
+
         AsyncIO doesn't have workers in the traditional sense,
         so this is a no-op.
-        
+
         Args:
             num_workers: Ignored
         """

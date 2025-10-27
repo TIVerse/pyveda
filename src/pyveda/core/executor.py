@@ -9,14 +9,14 @@ from pyveda.core.task import Task
 
 class BaseExecutor(ABC):
     """Abstract base class for all executors.
-    
+
     Executors handle the actual task execution using different
     concurrency primitives (threads, processes, async, GPU).
     """
 
     def __init__(self, name: str) -> None:
         """Initialize executor.
-        
+
         Args:
             name: Human-readable executor name
         """
@@ -26,10 +26,10 @@ class BaseExecutor(ABC):
     @abstractmethod
     def submit(self, task: Task) -> Future[Any]:
         """Submit a task for execution.
-        
+
         Args:
             task: Task to execute
-            
+
         Returns:
             Future for the result
         """
@@ -38,7 +38,7 @@ class BaseExecutor(ABC):
     @abstractmethod
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the executor.
-        
+
         Args:
             wait: If True, wait for pending tasks to complete
         """
@@ -47,7 +47,7 @@ class BaseExecutor(ABC):
     @abstractmethod
     def is_available(self) -> bool:
         """Check if executor is available for work.
-        
+
         Returns:
             True if executor can accept tasks
         """
@@ -56,7 +56,7 @@ class BaseExecutor(ABC):
     @abstractmethod
     def scale(self, num_workers: int) -> None:
         """Scale the executor to the specified worker count.
-        
+
         Args:
             num_workers: Desired number of workers
         """

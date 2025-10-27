@@ -2,16 +2,16 @@
 
 import threading
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
 class ExecutionContext:
     """Thread-local execution context.
-    
+
     Tracks state for the current execution scope including
     active scheduler, telemetry, and deterministic mode.
-    
+
     Attributes:
         task_id: ID of currently executing task
         thread_id: OS thread identifier
@@ -20,9 +20,9 @@ class ExecutionContext:
         metadata: Additional context metadata
     """
 
-    task_id: Optional[str] = None
+    task_id: str | None = None
     thread_id: int = field(default_factory=threading.get_ident)
-    deterministic_seed: Optional[int] = None
+    deterministic_seed: int | None = None
     telemetry_enabled: bool = True
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -33,7 +33,7 @@ _context_storage = threading.local()
 
 def get_context() -> ExecutionContext:
     """Get the current execution context.
-    
+
     Returns:
         ExecutionContext for current thread
     """
@@ -44,7 +44,7 @@ def get_context() -> ExecutionContext:
 
 def set_context(context: ExecutionContext) -> None:
     """Set the execution context for current thread.
-    
+
     Args:
         context: ExecutionContext to activate
     """

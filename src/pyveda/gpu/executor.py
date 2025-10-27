@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 class GPUExecutor(BaseExecutor):
     """Executor for GPU-accelerated tasks.
-    
+
     Offloads suitable tasks to GPU using cost model.
     Falls back to CPU if GPU is unavailable or not beneficial.
     """
 
     def __init__(self, gpu_runtime: Any, name: str = "gpu-executor") -> None:
         """Initialize GPU executor.
-        
+
         Args:
             gpu_runtime: GPURuntime instance
             name: Executor name for logging
@@ -31,10 +31,10 @@ class GPUExecutor(BaseExecutor):
 
     def submit(self, task: Task) -> StdFuture[Any]:
         """Submit a task for GPU execution.
-        
+
         Args:
             task: Task to execute
-            
+
         Returns:
             Future for the result
         """
@@ -53,14 +53,16 @@ class GPUExecutor(BaseExecutor):
             result = self._gpu_runtime.execute(task.func, *task.args, **task.kwargs)
             future.set_result(result)
         except Exception as e:
-            logger.warning(f"GPU execution failed: {e}, CPU fallback not available in executor")
+            logger.warning(
+                f"GPU execution failed: {e}, CPU fallback not available in executor"
+            )
             future.set_exception(e)
 
         return future
 
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the executor.
-        
+
         Args:
             wait: Ignored for GPU executor
         """
@@ -72,7 +74,7 @@ class GPUExecutor(BaseExecutor):
 
     def is_available(self) -> bool:
         """Check if GPU executor is available.
-        
+
         Returns:
             True if GPU runtime is available
         """
@@ -80,9 +82,9 @@ class GPUExecutor(BaseExecutor):
 
     def scale(self, num_workers: int) -> None:
         """Scale the executor.
-        
+
         GPU doesn't have workers in traditional sense, this is a no-op.
-        
+
         Args:
             num_workers: Ignored
         """

@@ -2,7 +2,8 @@
 
 import functools
 import logging
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from pyveda.exceptions import GPUError
 
@@ -13,16 +14,16 @@ T = TypeVar("T")
 
 def gpu(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator for automatic GPU offload.
-    
+
     Automatically offloads function to GPU if beneficial,
     otherwise executes on CPU.
-    
+
     Args:
         func: Function to wrap
-        
+
     Returns:
         Wrapped function
-        
+
     Example:
         @gpu
         def matrix_multiply(A, B):
@@ -35,7 +36,7 @@ def gpu(func: Callable[..., T]) -> Callable[..., T]:
         from pyveda.core.runtime import get_runtime
 
         runtime = get_runtime()
-        
+
         if runtime.gpu and runtime.gpu.is_available():
             # Check if offload is beneficial
             if runtime.gpu.should_offload(func, args):
@@ -46,7 +47,7 @@ def gpu(func: Callable[..., T]) -> Callable[..., T]:
                     logger.warning(f"GPU execution failed, falling back to CPU: {e}")
                     # Fallback to CPU
                     return func(*args, **kwargs)
-        
+
         # Execute on CPU
         return func(*args, **kwargs)
 
@@ -55,12 +56,12 @@ def gpu(func: Callable[..., T]) -> Callable[..., T]:
 
 def gpu_kernel(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator for GPU kernel functions.
-    
+
     Marks function as a GPU kernel (requires Numba @cuda.jit).
-    
+
     Args:
         func: Kernel function
-        
+
     Returns:
         Wrapped function
     """

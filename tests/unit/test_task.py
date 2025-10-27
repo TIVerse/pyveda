@@ -28,13 +28,14 @@ def test_task_execution():
 
 def test_task_execution_failure():
     """Test task execution with error."""
+
     def failing_func():
         raise ValueError("Test error")
-    
+
     task = Task(func=failing_func)
     with pytest.raises(ValueError):
         task.execute()
-    
+
     assert task.state == TaskState.FAILED
     assert task.error is not None
 
@@ -44,7 +45,7 @@ def test_task_cancellation():
     task = Task(func=lambda: None)
     assert task.cancel() is True
     assert task.state == TaskState.CANCELLED
-    
+
     # Cannot cancel running task
     task2 = Task(func=lambda: None)
     task2.state = TaskState.RUNNING
@@ -55,6 +56,6 @@ def test_task_priority_ordering():
     """Test task priority comparison."""
     low = Task(priority=TaskPriority.LOW)
     high = Task(priority=TaskPriority.HIGH)
-    
+
     # Higher priority should be "less than" for min heap
     assert high < low

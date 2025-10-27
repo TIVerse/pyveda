@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyveda.config import Config, ConfigBuilder, SchedulingPolicy
+from pyveda.config import Config, SchedulingPolicy
 
 
 def test_config_default():
@@ -15,14 +15,7 @@ def test_config_default():
 
 def test_config_builder():
     """Test fluent configuration builder."""
-    config = (
-        Config.builder()
-        .threads(4)
-        .processes(2)
-        .gpu(True)
-        .telemetry(False)
-        .build()
-    )
+    config = Config.builder().threads(4).processes(2).gpu(True).telemetry(False).build()
     assert config.num_threads == 4
     assert config.num_processes == 2
     assert config.enable_gpu is True
@@ -40,10 +33,10 @@ def test_config_validation():
     """Test configuration validation."""
     with pytest.raises(ValueError):
         Config(num_threads=0)
-    
+
     with pytest.raises(ValueError):
         Config(adaptive_interval_ms=5)
-    
+
     with pytest.raises(ValueError):
         Config(min_workers=0)
 

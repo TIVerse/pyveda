@@ -2,9 +2,10 @@
 
 import inspect
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Callable, Optional
+from typing import Any
 
 
 class TaskState(Enum):
@@ -30,7 +31,7 @@ class TaskPriority(Enum):
 @dataclass
 class Task:
     """Represents a unit of work to be executed.
-    
+
     Attributes:
         id: Unique identifier for the task
         func: Function to execute
@@ -49,11 +50,11 @@ class Task:
     args: tuple[Any, ...] = field(default_factory=tuple)
     kwargs: dict[str, Any] = field(default_factory=dict)
     priority: TaskPriority = TaskPriority.NORMAL
-    estimated_duration_ms: Optional[float] = None
+    estimated_duration_ms: float | None = None
     is_async: bool = False
     state: TaskState = TaskState.PENDING
     result: Any = None
-    error: Optional[Exception] = None
+    error: Exception | None = None
 
     def __post_init__(self) -> None:
         """Auto-detect async functions if not explicitly set."""
@@ -62,14 +63,16 @@ class Task:
 
     def __lt__(self, other: "Task") -> bool:
         """Compare tasks by priority for priority queue."""
-        return self.priority.value > other.priority.value  # Higher priority = lower value
+        return (
+            self.priority.value > other.priority.value
+        )  # Higher priority = lower value
 
     def execute(self) -> Any:
         """Execute the task synchronously.
-        
+
         Returns:
             Result of the function call
-            
+
         Raises:
             Any exception raised by the function
         """
@@ -86,7 +89,7 @@ class Task:
 
     def cancel(self) -> bool:
         """Attempt to cancel the task.
-        
+
         Returns:
             True if cancellation succeeded
         """
@@ -97,8 +100,12 @@ class Task:
 
     def is_done(self) -> bool:
         """Check if task has completed execution.
-        
+
         Returns:
             True if task is in terminal state
         """
-        return self.state in (TaskState.COMPLETED, TaskState.FAILED, TaskState.CANCELLED)
+        return self.state in (
+            TaskState.COMPLETED,
+            TaskState.FAILED,
+            TaskState.CANCELLED,
+        )

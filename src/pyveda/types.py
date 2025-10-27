@@ -1,12 +1,13 @@
 """Type definitions and protocols for PyVeda."""
 
 import sys
-from typing import Any, Callable, Protocol, TypeVar
+from collections.abc import Callable
+from typing import Any, Protocol, TypeVar
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    pass
 else:
-    from typing_extensions import Self
+    pass
 
 # Type variables for generic operations
 T = TypeVar("T")
@@ -24,16 +25,16 @@ AsyncMapFunc = Callable[[T], Any]  # Returns Awaitable[U]
 
 class Executor(Protocol):
     """Protocol defining executor interface.
-    
+
     All executors (thread, process, async, GPU) must implement this interface.
     """
 
     def submit(self, task: "Task") -> "Future[Any]":
         """Submit a task for execution.
-        
+
         Args:
             task: Task to execute
-            
+
         Returns:
             Future representing the result
         """
@@ -41,7 +42,7 @@ class Executor(Protocol):
 
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the executor.
-        
+
         Args:
             wait: If True, wait for pending tasks to complete
         """
@@ -49,7 +50,7 @@ class Executor(Protocol):
 
     def is_available(self) -> bool:
         """Check if executor is available for work.
-        
+
         Returns:
             True if executor can accept tasks
         """
@@ -61,13 +62,13 @@ class Future(Protocol[T_co]):
 
     def result(self, timeout: float | None = None) -> T_co:
         """Get the result, blocking if necessary.
-        
+
         Args:
             timeout: Maximum time to wait in seconds
-            
+
         Returns:
             The result value
-            
+
         Raises:
             TimeoutError: If timeout expires
         """
@@ -75,7 +76,7 @@ class Future(Protocol[T_co]):
 
     def done(self) -> bool:
         """Check if the future is done.
-        
+
         Returns:
             True if the future has completed
         """
@@ -83,7 +84,7 @@ class Future(Protocol[T_co]):
 
     def cancel(self) -> bool:
         """Attempt to cancel execution.
-        
+
         Returns:
             True if cancellation succeeded
         """

@@ -1,0 +1,32 @@
+========================================
+Running PyVeda CI Tests Locally
+========================================
+
+Activating virtual environment...
+[0;32m✓ Virtual environment activated[0m
+
+Step 1: Checking dependencies...
+[0;32m✓ Dependencies installed[0m
+
+========================================
+Step 2: Linting with ruff
+========================================
+warning: The top-level linter settings are deprecated in favour of their counterparts in the `lint` section. Please update the following options in `pyproject.toml`:
+  - 'ignore' -> 'lint.ignore'
+  - 'select' -> 'lint.select'
+I001 [*] Import block is un-sorted or un-formatted
+ --> src/pyveda/gpu/backend.py:3:1
+  |
+1 |   """GPU runtime backend with CuPy/Numba support."""
+2 |
+3 | / import logging
+4 | | import sys
+5 | | from collections.abc import Callable
+6 | | from typing import Any
+  | |______________________^
+  |
+help: Organize imports
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+[0;31m✗ Ruff check failed[0m

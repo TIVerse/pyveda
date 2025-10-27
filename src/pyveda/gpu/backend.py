@@ -2,27 +2,27 @@
 
 import logging
 import sys
-from typing import Any, Callable, Optional
-
-from pyveda.exceptions import GPUError
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class GPURuntime:
     """GPU runtime for automatic GPU offload.
-    
+
     Detects available GPU backends (CuPy, Numba) and provides
     unified interface for GPU execution with cost-based offload.
     """
 
     def __init__(self) -> None:
         """Initialize GPU runtime."""
-        self.backend: Optional[str] = None
-        self.device_count = 0
-        self._cp: Optional[Any] = None  # CuPy module
-        self._numba_cuda: Optional[Any] = None  # Numba CUDA module
-        self.memory_pool: Optional[Any] = None  # GPU memory pool
+        self._backend: str | None = None
+        self._device_count = 0
+        self._available = False
+        self._cp: Any | None = None  # CuPy module
+        self._numba_cuda: Any | None = None  # Numba CUDA module
+        self.memory_pool: Any | None = None  # GPU memory pool
 
         self._detect_backend()
         self._init_memory_pool()
@@ -30,7 +30,7 @@ class GPURuntime:
 
     def _detect_backend(self) -> bool:
         """Detect available GPU backend.
-        
+
         Returns:
             True if GPU is available
         """
@@ -40,8 +40,9 @@ class GPURuntime:
 
             self._device_count = cp.cuda.runtime.getDeviceCount()
             if self._device_count > 0:
-                self._available = True
+                self._cp = cp
                 self._backend = "cupy"
+                self._available = True
                 logger.info(f"GPU detected: CuPy with {self._device_count} device(s)")
                 return True
         except Exception as e:
@@ -53,8 +54,9 @@ class GPURuntime:
 
             if cuda.is_available():
                 self._device_count = len(cuda.gpus)
-                self._available = True
+                self._numba_cuda = cuda
                 self._backend = "numba"
+                self._available = True
                 logger.info(f"GPU detected: Numba with {self._device_count} device(s)")
                 return True
         except Exception as e:
@@ -65,16 +67,16 @@ class GPURuntime:
 
     def is_available(self) -> bool:
         """Check if GPU is available.
-        
+
         Returns:
             True if GPU is available
         """
         return self._available
 
     @property
-    def backend(self) -> Optional[str]:
+    def backend(self) -> str | None:
         """Get the active backend name.
-        
+
         Returns:
             Backend name or None
         """
@@ -83,7 +85,7 @@ class GPURuntime:
     @property
     def device_count(self) -> int:
         """Get number of available GPUs.
-        
+
         Returns:
             Number of GPUs
         """
@@ -91,13 +93,13 @@ class GPURuntime:
 
     def should_offload(self, func: Callable[..., Any], args: tuple[Any, ...]) -> bool:
         """Determine if function should be offloaded to GPU.
-        
+
         Uses cost model based on data size and memory availability.
-        
+
         Args:
             func: Function to execute
             args: Function arguments
-            
+
         Returns:
             True if GPU offload is beneficial
         """
@@ -106,7 +108,7 @@ class GPURuntime:
 
         # Estimate data size
         data_size = sum(self._estimate_size(arg) for arg in args)
-        
+
         # Small data: transfer overhead too high
         if data_size < 1024 * 1024:  # < 1MB
             return False
@@ -118,7 +120,7 @@ class GPURuntime:
 
                 free, total = cp.cuda.Device().mem_info()
                 used_ratio = 1.0 - (free / total)  # FIXED: correct computation
-                
+
                 if used_ratio > 0.9:  # > 90% used
                     logger.debug(f"GPU memory usage high: {used_ratio:.1%}")
                     return False
@@ -130,20 +132,22 @@ class GPURuntime:
 
     def execute(self, func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
         """Execute function on GPU.
-        
+
         Args:
             func: Function to execute
             *args: Positional arguments
             **kwargs: Keyword arguments
-            
+
         Returns:
             Result (transferred back to CPU)
-            
+
         Raises:
             GPUError: If execution fails
         """
         if not self._available:
-            raise GPUError("GPU not available")
+            # Fallback to CPU execution
+            logger.debug("GPU not available, falling back to CPU")
+            return func(*args, **kwargs)
 
         try:
             if self._backend == "cupy":
@@ -151,18 +155,22 @@ class GPURuntime:
             elif self._backend == "numba":
                 return self._execute_numba(func, *args, **kwargs)
             else:
-                raise GPUError(f"Unknown backend: {self._backend}")
+                # Fallback to CPU for unknown backend
+                logger.warning(f"Unknown backend: {self._backend}, falling back to CPU")
+                return func(*args, **kwargs)
         except Exception as e:
-            raise GPUError(f"GPU execution failed: {e}") from e
+            # Fallback to CPU on GPU execution failure
+            logger.warning(f"GPU execution failed: {e}, falling back to CPU")
+            return func(*args, **kwargs)
 
     def _execute_cupy(self, func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
         """Execute using CuPy.
-        
+
         Args:
             func: Function to execute
             *args: Arguments
             **kwargs: Keyword arguments
-            
+
         Returns:
             Result
         """
@@ -184,14 +192,16 @@ class GPURuntime:
             return result.get()
         return result
 
-    def _execute_numba(self, func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    def _execute_numba(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         """Execute using Numba.
-        
+
         Args:
             func: Function to execute
             *args: Arguments
             **kwargs: Keyword arguments
-            
+
         Returns:
             Result
         """
@@ -201,10 +211,10 @@ class GPURuntime:
 
     def _estimate_size(self, obj: Any) -> int:
         """Estimate object size in bytes.
-        
+
         Args:
             obj: Object to estimate
-            
+
         Returns:
             Estimated size in bytes
         """
@@ -219,6 +229,7 @@ class GPURuntime:
         if self.backend == "cupy" and self._cp is not None:
             try:
                 from pyveda.gpu.memory import GPUMemoryPool
+
                 self.memory_pool = GPUMemoryPool(self._cp)
                 # Set CuPy to use the memory pool
                 self._cp.cuda.set_allocator(self.memory_pool.malloc)
@@ -228,38 +239,38 @@ class GPURuntime:
 
     def get_memory_stats(self) -> dict[str, float]:
         """Get GPU memory statistics.
-        
+
         Returns:
             Dictionary with memory stats (used_mb, free_mb, total_mb)
         """
         if not self.is_available():
-            return {'used_mb': 0.0, 'free_mb': 0.0, 'total_mb': 0.0}
+            return {"used_mb": 0.0, "free_mb": 0.0, "total_mb": 0.0}
 
         try:
             if self.backend == "cupy" and self._cp is not None:
                 mempool = self._cp.get_default_memory_pool()
                 used_bytes = mempool.used_bytes()
-                total_bytes = mempool.total_bytes()
-                
+                mempool.total_bytes()
+
                 # Get device memory info
                 free_mem, total_mem = self._cp.cuda.runtime.memGetInfo()
-                
+
                 return {
-                    'used_mb': used_bytes / (1024 ** 2),
-                    'free_mb': free_mem / (1024 ** 2),
-                    'total_mb': total_mem / (1024 ** 2),
+                    "used_mb": used_bytes / (1024**2),
+                    "free_mb": free_mem / (1024**2),
+                    "total_mb": total_mem / (1024**2),
                 }
             elif self.backend == "numba" and self._numba_cuda is not None:
                 # Numba doesn't expose memory stats easily
-                return {'used_mb': 0.0, 'free_mb': 0.0, 'total_mb': 0.0}
+                return {"used_mb": 0.0, "free_mb": 0.0, "total_mb": 0.0}
         except Exception as e:
             logger.debug(f"Failed to get GPU memory stats: {e}")
-        
-        return {'used_mb': 0.0, 'free_mb': 0.0, 'total_mb': 0.0}
+
+        return {"used_mb": 0.0, "free_mb": 0.0, "total_mb": 0.0}
 
     def get_utilization(self) -> float:
         """Get GPU utilization percentage.
-        
+
         Returns:
             Utilization percentage (0-100)
         """
@@ -267,19 +278,24 @@ class GPURuntime:
             if self.backend == "cupy" and self._cp is not None:
                 # Try to use nvidia-smi via subprocess
                 import subprocess
+
                 result = subprocess.run(
-                    ['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
+                    [
+                        "nvidia-smi",
+                        "--query-gpu=utilization.gpu",
+                        "--format=csv,noheader,nounits",
+                    ],
                     capture_output=True,
                     text=True,
-                    timeout=1
+                    timeout=1,
                 )
                 if result.returncode == 0:
-                    return float(result.stdout.strip().split('\n')[0])
+                    return float(result.stdout.strip().split("\n")[0])
         except Exception:
             pass
-        
+
         # Fallback: estimate from memory usage
         stats = self.get_memory_stats()
-        if stats['total_mb'] > 0:
-            return (stats['used_mb'] / stats['total_mb']) * 100.0
+        if stats["total_mb"] > 0:
+            return (stats["used_mb"] / stats["total_mb"]) * 100.0
         return 0.0

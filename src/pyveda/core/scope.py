@@ -1,8 +1,9 @@
 """Scoped execution for structured parallelism."""
 
 import logging
+from collections.abc import Callable
 from concurrent.futures import Future as StdFuture
-from typing import Any, Callable, ContextManager, Optional, TypeVar
+from typing import Any, TypeVar
 
 from pyveda.core.task import Task, TaskPriority
 from pyveda.exceptions import VedaError
@@ -14,10 +15,10 @@ T = TypeVar("T")
 
 class Scope:
     """Structured parallelism scope.
-    
+
     Provides scoped execution where all spawned tasks
     are awaited before exiting the scope.
-    
+
     Example:
         with scope() as s:
             f1 = s.spawn(lambda: task1())
@@ -37,16 +38,16 @@ class Scope:
         **kwargs: Any,
     ) -> StdFuture[T]:
         """Spawn a task within the scope.
-        
+
         Args:
             func: Function to execute
             *args: Positional arguments
             priority: Task priority
             **kwargs: Keyword arguments
-            
+
         Returns:
             Future for the result
-            
+
         Raises:
             VedaError: If scope is closed
         """
@@ -67,15 +68,15 @@ class Scope:
         self._futures.append(future)
         return future
 
-    def wait_all(self, timeout: Optional[float] = None) -> list[Any]:
+    def wait_all(self, timeout: float | None = None) -> list[Any]:
         """Wait for all spawned tasks to complete.
-        
+
         Args:
             timeout: Maximum time to wait in seconds
-            
+
         Returns:
             List of results in spawn order
-            
+
         Raises:
             TimeoutError: If timeout expires
             Exception: If any task failed
@@ -103,7 +104,7 @@ class Scope:
 
 def scope() -> Scope:
     """Create a new execution scope.
-    
+
     Returns:
         New Scope instance
     """
@@ -117,13 +118,13 @@ def spawn(
     **kwargs: Any,
 ) -> StdFuture[T]:
     """Spawn a task on the runtime without a scope.
-    
+
     Args:
         func: Function to execute
         *args: Positional arguments
         priority: Task priority
         **kwargs: Keyword arguments
-        
+
     Returns:
         Future for the result
     """

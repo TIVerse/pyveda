@@ -17,10 +17,10 @@ _runtime_lock = __import__("threading").Lock()
 
 class Runtime:
     """Global runtime managing scheduler, executors, and telemetry.
-    
+
     This is the central coordination point for PyVeda. It owns
     the scheduler, all executors, and optional GPU/telemetry systems.
-    
+
     Attributes:
         config: Runtime configuration
         scheduler: Task scheduler
@@ -30,24 +30,24 @@ class Runtime:
 
     def __init__(self, config: Config) -> None:
         """Initialize runtime.
-        
+
         Args:
             config: Runtime configuration
         """
         self.config = config
-        
+
         # Initialize scheduler based on policy
         if config.scheduling_policy == SchedulingPolicy.DETERMINISTIC:
             from pyveda.deterministic.scheduler import DeterministicScheduler
+
             self.scheduler = DeterministicScheduler(
-                config, 
-                seed=config.deterministic_seed or 42
+                config, seed=config.deterministic_seed or 42
             )
         else:
             self.scheduler = AdaptiveScheduler(config)
-        
-        self.gpu: Optional[Any] = None
-        self.telemetry: Optional[Any] = None
+
+        self.gpu: Any | None = None
+        self.telemetry: Any | None = None
 
         # Initialize executors
         self._init_executors()
@@ -67,8 +67,8 @@ class Runtime:
     def _init_executors(self) -> None:
         """Initialize and register executors."""
         from pyveda.config import ExecutorType
-        from pyveda.executors.thread_pool import ThreadPoolExecutor
         from pyveda.executors.process_pool import ProcessPoolExecutor
+        from pyveda.executors.thread_pool import ThreadPoolExecutor
 
         # Thread pool executor
         thread_pool = ThreadPoolExecutor(
@@ -103,7 +103,7 @@ class Runtime:
             self.gpu = GPURuntime()
             if self.gpu.is_available():
                 logger.info(f"GPU runtime initialized: {self.gpu.backend}")
-                
+
                 # Register GPU executor with scheduler
                 gpu_executor = GPUExecutor(self.gpu, name="gpu-executor")
                 self.scheduler.register_executor(ExecutorType.GPU, gpu_executor)
@@ -160,15 +160,15 @@ class Runtime:
         logger.info("Runtime shutdown complete")
 
 
-def init(config: Optional[Config] = None) -> Runtime:
+def init(config: Config | None = None) -> Runtime:
     """Initialize the global runtime.
-    
+
     Args:
         config: Runtime configuration (uses defaults if None)
-        
+
     Returns:
         Initialized Runtime instance
-        
+
     Raises:
         VedaError: If runtime is already initialized
     """
@@ -201,10 +201,10 @@ def shutdown() -> None:
 
 def get_runtime() -> Runtime:
     """Get the global runtime instance.
-    
+
     Returns:
         Runtime instance
-        
+
     Raises:
         VedaError: If runtime not initialized
     """

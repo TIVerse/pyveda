@@ -5,15 +5,15 @@ processes, asyncio, and GPU under a single adaptive API.
 
 Example:
     import pyveda as veda
-    
+
     # Parallel iteration
     result = veda.par_iter(range(1000)).map(lambda x: x**2).sum()
-    
+
     # GPU acceleration
     @veda.gpu
     def matrix_multiply(A, B):
         return A @ B
-    
+
     # Deterministic debugging
     with veda.deterministic(seed=42):
         result = flaky_computation()

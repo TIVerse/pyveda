@@ -1,21 +1,21 @@
 """GPU memory management utilities."""
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class GPUMemoryPool:
     """GPU memory pool for efficient allocation.
-    
+
     Provides memory pooling to reduce allocation overhead.
     """
 
     def __init__(self) -> None:
         """Initialize memory pool."""
-        self._pool: Optional[Any] = None
-        self._backend: Optional[str] = None
+        self._pool: Any | None = None
+        self._backend: str | None = None
         self._init_pool()
 
     def _init_pool(self) -> None:
@@ -32,7 +32,7 @@ class GPUMemoryPool:
 
     def get_memory_info(self) -> tuple[int, int]:
         """Get memory usage information.
-        
+
         Returns:
             Tuple of (used_bytes, total_bytes)
         """

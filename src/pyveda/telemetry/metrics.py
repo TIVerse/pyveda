@@ -3,8 +3,8 @@
 import logging
 import threading
 import time
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any
 
 import psutil
 
@@ -16,7 +16,7 @@ class Counter:
 
     def __init__(self, name: str, description: str = "") -> None:
         """Initialize counter.
-        
+
         Args:
             name: Metric name
             description: Human-readable description
@@ -28,7 +28,7 @@ class Counter:
 
     def inc(self, amount: int = 1) -> None:
         """Increment counter.
-        
+
         Args:
             amount: Amount to increment
         """
@@ -37,7 +37,7 @@ class Counter:
 
     def get(self) -> int:
         """Get current value.
-        
+
         Returns:
             Current counter value
         """
@@ -55,7 +55,7 @@ class Gauge:
 
     def __init__(self, name: str, description: str = "") -> None:
         """Initialize gauge.
-        
+
         Args:
             name: Metric name
             description: Human-readable description
@@ -67,7 +67,7 @@ class Gauge:
 
     def set(self, value: float) -> None:
         """Set gauge value.
-        
+
         Args:
             value: New value
         """
@@ -76,7 +76,7 @@ class Gauge:
 
     def inc(self, amount: float = 1.0) -> None:
         """Increment gauge.
-        
+
         Args:
             amount: Amount to increment
         """
@@ -85,7 +85,7 @@ class Gauge:
 
     def dec(self, amount: float = 1.0) -> None:
         """Decrement gauge.
-        
+
         Args:
             amount: Amount to decrement
         """
@@ -94,7 +94,7 @@ class Gauge:
 
     def get(self) -> float:
         """Get current value.
-        
+
         Returns:
             Current gauge value
         """
@@ -107,20 +107,20 @@ class Histogram:
 
     def __init__(self, name: str, description: str = "") -> None:
         """Initialize histogram.
-        
+
         Args:
             name: Metric name
             description: Human-readable description
         """
         self.name = name
         self.description = description
-        self._samples: List[float] = []
+        self._samples: list[float] = []
         self._lock = threading.Lock()
         self._max_samples = 10000  # Keep last N samples
 
     def observe(self, value: float) -> None:
         """Record an observation.
-        
+
         Args:
             value: Value to record
         """
@@ -132,10 +132,10 @@ class Histogram:
 
     def get_percentile(self, percentile: float) -> float:
         """Get percentile value.
-        
+
         Args:
             percentile: Percentile (0-100)
-            
+
         Returns:
             Percentile value
         """
@@ -149,7 +149,7 @@ class Histogram:
 
     def get_mean(self) -> float:
         """Get mean value.
-        
+
         Returns:
             Mean of samples
         """
@@ -160,7 +160,7 @@ class Histogram:
 
     def get_count(self) -> int:
         """Get sample count.
-        
+
         Returns:
             Number of samples
         """
@@ -171,7 +171,7 @@ class Histogram:
 @dataclass
 class MetricsSnapshot:
     """Snapshot of system metrics.
-    
+
     Captures point-in-time metrics for export and monitoring.
     """
 
@@ -186,12 +186,12 @@ class MetricsSnapshot:
     throughput_tasks_per_sec: float
     cpu_utilization_percent: float
     memory_used_mb: float
-    gpu_utilization_percent: Optional[float] = None
-    gpu_memory_used_mb: Optional[float] = None
+    gpu_utilization_percent: float | None = None
+    gpu_memory_used_mb: float | None = None
 
     def export_prometheus(self) -> str:
         """Export metrics in Prometheus format.
-        
+
         Returns:
             Prometheus-formatted metrics
         """
@@ -236,9 +236,9 @@ class MetricsSnapshot:
 
         return "\n".join(lines)
 
-    def export_json(self) -> Dict[str, Any]:
+    def export_json(self) -> dict[str, Any]:
         """Export metrics as JSON.
-        
+
         Returns:
             Dictionary of metrics
         """
@@ -264,20 +264,20 @@ class MetricsSnapshot:
 
 class TelemetrySystem:
     """Telemetry system for collecting and exporting metrics.
-    
+
     Runs a background thread to periodically collect metrics
     from the scheduler and system.
     """
 
     def __init__(self, scheduler: Any) -> None:
         """Initialize telemetry system.
-        
+
         Args:
             scheduler: Scheduler to monitor
         """
         self.scheduler = scheduler
         self._running = False
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
 
         # Metrics
         self.tasks_executed = Counter("tasks_executed", "Total tasks executed")
@@ -285,9 +285,9 @@ class TelemetrySystem:
         self.latency_histogram = Histogram("task_latency_ms", "Task latency in ms")
 
         # Snapshots
-        self._snapshots: List[MetricsSnapshot] = []
+        self._snapshots: list[MetricsSnapshot] = []
         self._max_snapshots = 100
-        
+
         # Track last values for delta computation
         self._last_task_count = 0
         self._last_snapshot_time = time.time()
@@ -311,7 +311,7 @@ class TelemetrySystem:
 
     def snapshot(self) -> MetricsSnapshot:
         """Create a metrics snapshot.
-        
+
         Returns:
             Current metrics snapshot
         """
@@ -329,13 +329,10 @@ class TelemetrySystem:
             executor_stats.get("tasks_failed", 0)
             for executor_stats in stats["executors"].values()
         )
-        avg_latency = (
-            sum(
-                executor_stats["avg_latency_ms"]
-                for executor_stats in stats["executors"].values()
-            )
-            / max(len(stats["executors"]), 1)
-        )
+        avg_latency = sum(
+            executor_stats["avg_latency_ms"]
+            for executor_stats in stats["executors"].values()
+        ) / max(len(stats["executors"]), 1)
 
         # Compute throughput from delta
         tasks_delta = total_executed - self._last_task_count
@@ -344,17 +341,18 @@ class TelemetrySystem:
         # System metrics
         cpu_percent = stats.get("cpu_percent", 0.0)
         memory_mb = psutil.virtual_memory().used / (1024 * 1024)
-        
+
         # GPU metrics if available
         gpu_util = None
         gpu_mem = None
         try:
             from pyveda.core.runtime import get_runtime
+
             runtime = get_runtime()
             if runtime.gpu and runtime.gpu.is_available():
                 gpu_util = runtime.gpu.get_utilization()
                 gpu_stats = runtime.gpu.get_memory_stats()
-                gpu_mem = gpu_stats.get('used_mb', 0.0)
+                gpu_mem = gpu_stats.get("used_mb", 0.0)
         except Exception:
             pass
 
@@ -374,7 +372,7 @@ class TelemetrySystem:
             gpu_utilization_percent=gpu_util,
             gpu_memory_used_mb=gpu_mem,
         )
-        
+
         # Update tracking variables
         self._last_task_count = total_executed
         self._last_snapshot_time = now
@@ -395,9 +393,9 @@ class TelemetrySystem:
             except Exception as e:
                 logger.error(f"Telemetry collection error: {e}")
 
-    def get_snapshots(self) -> List[MetricsSnapshot]:
+    def get_snapshots(self) -> list[MetricsSnapshot]:
         """Get all stored snapshots.
-        
+
         Returns:
             List of snapshots
         """
