@@ -12,7 +12,7 @@
 
 ### 1.1 What is PyVeda?
 
-PyVeda (Python Versatile Execution and Dynamic Adaptation) is a production-ready parallel runtime library that unifies Python's fragmented concurrency ecosystem under a single adaptive, observable, and deterministic execution layer. It is the Python counterpart to the Rust project `veda-rs`, providing a drop-in replacement for Ray, Dask, and asyncio with superior ergonomics and performance.
+PyVeda (Python Versatile Execution and Dynamic Adaptation) is a parallel runtime library that unifies Python's fragmented concurrency ecosystem under a single adaptive, observable, and deterministic execution layer. It is the Python counterpart to the Rust project `veda-rs`, providing a drop-in replacement for Ray, Dask, and asyncio with superior ergonomics and performance.
 
 ### 1.2 The Problem
 
@@ -30,7 +30,7 @@ Python's concurrency landscape is severely fragmented:
 **No library provides:**
 - ✅ Unified API across execution modes
 - ✅ Automatic adaptive scheduling
-- ✅ Zero-setup production deployment
+- ✅ Zero-setup deployment
 - ✅ Deterministic replay for testing
 - ✅ Rich telemetry and observability
 
@@ -282,7 +282,7 @@ A unified parallel computing framework for Python providing:
 - Adaptive scheduling across threads, processes, async, and GPU
 - Rayon-like parallel iterators with zero boilerplate
 - Rich telemetry and deterministic replay
-- Production-ready performance and reliability
+- High performance and reliability
 
 Example:
     >>> import pyveda as veda
@@ -1214,7 +1214,7 @@ def deterministic(seed: int):
 | **Type Safety** | ✅ Full | ⚠️ Partial | ⚠️ Partial | ✅ Full | ⚠️ Partial |
 | **Memory Overhead** | ✅ Low | ❌ High | ❌ High | ✅ Low | ✅ Low |
 | **Learning Curve** | ✅ Easy | ❌ Steep | ⚠️ Medium | ⚠️ Medium | ✅ Easy |
-| **Production Ready** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Stable** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Distributed** | ❌ No* | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
 
 *Planned for v2.0
@@ -1261,7 +1261,7 @@ keywords = [
     "scheduler", "telemetry", "deterministic", "rayon"
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -2615,8 +2615,8 @@ For enterprise support, consulting, and custom development:
 **Q: Does PyVeda eliminate the GIL?**
 A: No, but it works around it using processes for CPU-bound tasks and GPU for compatible workloads.
 
-**Q: Is PyVeda production-ready?**
-A: Yes, v1.0.0 is thoroughly tested and ready for production use.
+**Q: Is PyVeda ready for use?**
+A: Yes, v1.0.0 is thoroughly tested and ready to use.
 
 **Q: Can I use PyVeda with Ray/Dask?**
 A: Yes, PyVeda can coexist with other libraries, but provides a simpler alternative for most use cases.
@@ -2667,12 +2667,12 @@ with veda.scope() as s:
 
 ## 19. Conclusion
 
-PyVeda represents a **complete reimagining** of parallel computing for Python. By unifying fragmented ecosystems, providing adaptive optimization, and maintaining production-grade quality, PyVeda enables developers to:
+PyVeda represents a **complete reimagining** of parallel computing for Python. By unifying fragmented ecosystems, providing adaptive optimization, and maintaining high quality, PyVeda enables developers to:
 
 ✅ **Write less code** - Simple, intuitive API  
 ✅ **Run faster** - Adaptive scheduling and GPU acceleration  
 ✅ **Debug easier** - Deterministic replay and rich telemetry  
-✅ **Deploy confidently** - Production-ready from day one  
+✅ **Deploy confidently** - Ready to use from day one  
 
 **Ready to get started?**
 

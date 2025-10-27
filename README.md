@@ -1,6 +1,6 @@
 # PyVeda
 
-**Production-grade parallel runtime for Python**
+**Parallel runtime for Python**
 
 PyVeda unifies Python's fragmented concurrency ecosystem (threads, processes, asyncio, GPU) under a single adaptive, observable API inspired by Rayon.
 

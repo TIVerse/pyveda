@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyveda"
 version = "1.0.0"
-description = "Production-grade parallel runtime unifying Python's concurrency ecosystem"
+description = "Parallel runtime unifying Python's concurrency ecosystem"
 authors = [{name = "Ved", email = "ved@example.com"}]
 readme = "README.md"
 license = {text = "MIT"}

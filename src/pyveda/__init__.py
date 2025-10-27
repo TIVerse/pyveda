@@ -1,4 +1,4 @@
-"""PyVeda - Production-grade parallel runtime for Python.
+"""PyVeda - Parallel runtime for Python.
 
 A unified parallel computing library that brings together threads,
 processes, asyncio, and GPU under a single adaptive API.

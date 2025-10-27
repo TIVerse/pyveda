@@ -113,7 +113,7 @@ print(f"P99 Latency: {snapshot.p99_latency_ms:.2f}ms")
 - GPU memory optimization
 - Batching small operations
 
-### Production Deployment
+### Deployment
 
 - Configuration best practices
 - Monitoring and alerting

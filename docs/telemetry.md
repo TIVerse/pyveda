@@ -367,7 +367,7 @@ veda.init(config)
 
 ## Best Practices
 
-1. **Enable in Production** - Telemetry helps debug issues
+1. **Enable Telemetry** - Telemetry helps debug issues
 2. **Monitor Latency** - Watch P99 for performance degradation
 3. **Track Failures** - Alert on increased failure rate
 4. **Export Regularly** - Send to external monitoring systems
