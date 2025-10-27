@@ -1,4 +1,4 @@
-"""Benchmark comparing PyVeda with other frameworks."""
+"""Benchmark comparing VedaRT with other frameworks."""
 
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
@@ -72,7 +72,7 @@ def benchmark_framework(
 
 
 def run_pyveda(tasks: List[int]) -> List[int]:
-    """Run tasks with PyVeda.
+    """Run tasks with VedaRT.
     
     Args:
         tasks: Task inputs
@@ -124,11 +124,11 @@ def run_sequential(tasks: List[int]) -> List[int]:
 def main():
     """Run framework comparison benchmarks."""
     print("=" * 60)
-    print("PyVeda Framework Comparison Benchmark")
+    print("VedaRT Framework Comparison Benchmark")
     print("=" * 60)
     print()
     
-    # Initialize PyVeda
+    # Initialize VedaRT
     config = veda.Config.builder().threads(4).build()
     veda.init(config)
     
@@ -142,7 +142,7 @@ def main():
         ("Sequential", run_sequential),
         ("ThreadPoolExecutor", run_thread_pool),
         ("ProcessPoolExecutor", run_process_pool),
-        ("PyVeda", run_pyveda),
+        ("VedaRT", run_pyveda),
     ]
     
     results = []

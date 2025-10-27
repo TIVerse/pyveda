@@ -1,4 +1,4 @@
-"""Benchmark scaling characteristics of PyVeda."""
+"""Benchmark scaling characteristics of VedaRT."""
 
 import time
 from typing import List, Tuple
@@ -51,7 +51,7 @@ def measure_scaling(
 def main():
     """Run scaling benchmarks."""
     print("=" * 60)
-    print("PyVeda Scaling Benchmark")
+    print("VedaRT Scaling Benchmark")
     print("=" * 60)
     print()
     

@@ -1,4 +1,4 @@
-"""Configuration management for PyVeda runtime."""
+"""Configuration management for VedaRT runtime."""
 
 from dataclasses import dataclass
 from enum import Enum
@@ -25,7 +25,7 @@ class ExecutorType(Enum):
 
 @dataclass
 class Config:
-    """Runtime configuration for PyVeda.
+    """Runtime configuration for VedaRT.
 
     Attributes:
         num_threads: Number of threads (None = cpu_count())

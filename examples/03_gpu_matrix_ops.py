@@ -17,7 +17,7 @@ def vector_add(a, b):
 
 def main():
     """Demonstrate GPU acceleration."""
-    print("PyVeda - GPU Acceleration\n")
+    print("VedaRT - GPU Acceleration\n")
     
     # Initialize runtime with GPU support
     config = veda.Config.builder().gpu(True).build()

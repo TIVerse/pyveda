@@ -13,7 +13,7 @@ def expensive_computation(n):
 
 def main():
     """Demonstrate scoped parallel execution."""
-    print("PyVeda - Scoped Execution\n")
+    print("VedaRT - Scoped Execution\n")
     
     # Using scope for structured parallelism
     print("Processing tasks in parallel scope...")

@@ -62,7 +62,7 @@ class Span:
 
 
 class TracingSystem:
-    """Manages distributed tracing for PyVeda tasks.
+    """Manages distributed tracing for VedaRT tasks.
 
     Provides span creation, context propagation, and export.
     """

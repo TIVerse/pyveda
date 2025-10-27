@@ -55,8 +55,8 @@ def load_batch(records: List[Dict]) -> int:
 
 
 def main():
-    """Demonstrate ETL pipeline with PyVeda."""
-    print("PyVeda - ETL Pipeline Example\n")
+    """Demonstrate ETL pipeline with VedaRT."""
+    print("VedaRT - ETL Pipeline Example\n")
     
     # Initialize runtime
     config = veda.Config.builder()\

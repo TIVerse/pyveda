@@ -5,7 +5,7 @@ import vedart as veda
 
 def main():
     """Demonstrate basic parallel operations."""
-    print("PyVeda - Hello Parallel World\n")
+    print("VedaRT - Hello Parallel World\n")
     
     # Simple map operation
     print("1. Parallel map:")

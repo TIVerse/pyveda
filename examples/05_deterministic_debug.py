@@ -14,7 +14,7 @@ def flaky_computation(seed_offset):
 
 def main():
     """Demonstrate deterministic debugging."""
-    print("PyVeda - Deterministic Debugging\n")
+    print("VedaRT - Deterministic Debugging\n")
     
     # Run without determinism
     print("1. Without deterministic mode:")

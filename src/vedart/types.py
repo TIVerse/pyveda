@@ -1,4 +1,4 @@
-"""Type definitions and protocols for PyVeda."""
+"""Type definitions and protocols for VedaRT."""
 
 import sys
 from collections.abc import Callable

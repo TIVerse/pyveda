@@ -1,4 +1,4 @@
-"""Async/await integration with PyVeda example."""
+"""Async/await integration with VedaRT example."""
 
 import asyncio
 import time
@@ -70,7 +70,7 @@ async def hybrid_task(task_id: int) -> dict:
     data = await async_fetch(url)
     
     # Sync compute (would block event loop if not handled properly)
-    # PyVeda can offload this to thread pool
+    # VedaRT can offload this to thread pool
     compute_result = sync_compute(task_id)
     
     # Async process
@@ -85,7 +85,7 @@ async def hybrid_task(task_id: int) -> dict:
 
 def main():
     """Demonstrate async integration."""
-    print("PyVeda - Async Integration Example\n")
+    print("VedaRT - Async Integration Example\n")
     
     # Initialize runtime with async support
     config = veda.Config.builder()\

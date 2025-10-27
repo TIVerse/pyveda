@@ -31,7 +31,7 @@ def benchmark_parallel_map(size):
 
 def main():
     """Run benchmarks."""
-    print("PyVeda Benchmarks\n")
+    print("VedaRT Benchmarks\n")
     print("=" * 60)
     
     sizes = [1000, 10000, 100000]

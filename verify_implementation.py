@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verification script for PyVeda gap completion.
+"""Verification script for VedaRT gap completion.
 
 This script tests all implemented features to ensure they work correctly.
 Run this after gap completion to validate the implementation.
@@ -30,7 +30,7 @@ def failure(message: str, error: Exception) -> None:
 
 def main() -> int:
     """Run all verification tests."""
-    print("PyVeda Gap Completion Verification")
+    print("VedaRT Gap Completion Verification")
     print("=" * 70)
     
     failures: List[str] = []

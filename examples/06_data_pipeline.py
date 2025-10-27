@@ -19,8 +19,8 @@ def validate_record(record):
 
 
 def main():
-    """Demonstrate ETL pipeline with PyVeda."""
-    print("PyVeda - Data Processing Pipeline\n")
+    """Demonstrate ETL pipeline with VedaRT."""
+    print("VedaRT - Data Processing Pipeline\n")
     
     # Stage 1: Extract data from multiple sources
     print("Stage 1: Extract")

@@ -319,7 +319,7 @@ veda.replay("debug.trace")
 
 ### Benchmarks vs Alternatives
 
-| Workload | PyVeda | Ray | Dask | asyncio | threading |
+| Workload | VedaRT | Ray | Dask | asyncio | threading |
 |----------|--------|-----|------|---------|----------|
 | CPU-bound (uniform) | **1.0x** | 0.9x | 0.77x | N/A | 1.05x |
 | CPU-bound (variable) | **1.0x** | 0.67x | 0.48x | N/A | 0.83x |
@@ -361,22 +361,22 @@ python examples/01_hello_parallel.py
 
 ### vs Ray
 
-✅ **PyVeda**: Zero setup, local-first design  
+✅ **VedaRT**: Zero setup, local-first design  
 ❌ **Ray**: Heavy dependencies, complex setup for local use
 
 ### vs Dask
 
-✅ **PyVeda**: Lightweight, simple API  
+✅ **VedaRT**: Lightweight, simple API  
 ❌ **Dask**: High memory overhead, scheduler complexity
 
 ### vs asyncio
 
-✅ **PyVeda**: Works for both I/O and CPU workloads  
+✅ **VedaRT**: Works for both I/O and CPU workloads  
 ❌ **asyncio**: Only I/O-bound, steep learning curve
 
 ### vs threading/multiprocessing
 
-✅ **PyVeda**: Automatic mode selection, adaptive scaling  
+✅ **VedaRT**: Automatic mode selection, adaptive scaling  
 ❌ **stdlib**: Manual pool management, no adaptation
 
 ## Requirements

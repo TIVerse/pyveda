@@ -34,7 +34,7 @@ def train_model(samples):
 
 def main():
     """Demonstrate ML training pipeline."""
-    print("PyVeda - ML Pipeline Example\n")
+    print("VedaRT - ML Pipeline Example\n")
     
     # Step 1: Parallel data loading
     print("Step 1: Load data batches (parallel I/O)")

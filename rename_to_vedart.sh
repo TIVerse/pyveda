@@ -18,13 +18,13 @@ find examples -type f -name "*.py" -exec sed -i 's/pyveda/vedart/g' {} +
 # Update documentation files
 echo "Step 2: Updating documentation..."
 find docs -type f -name "*.md" -exec sed -i 's/pyveda/vedart/g' {} +
-find docs -type f -name "*.md" -exec sed -i 's/PyVeda/VedaRT/g' {} +
+find docs -type f -name "*.md" -exec sed -i 's/VedaRT/VedaRT/g' {} +
 find docs -type f -name "*.md" -exec sed -i 's/pip install vedart/pip install vedart/g' {} +
 
 # Update GitHub workflows
 echo "Step 3: Updating GitHub workflows..."
 find .github -type f -name "*.yml" -exec sed -i 's/pyveda/vedart/g' {} +
-find .github -type f -name "*.yml" -exec sed -i 's/PyVeda/VedaRT/g' {} +
+find .github -type f -name "*.yml" -exec sed -i 's/VedaRT/VedaRT/g' {} +
 
 # Update test configuration
 echo "Step 4: Updating test configuration..."
@@ -40,7 +40,7 @@ fi
 echo "Step 5: Updating CI test script..."
 if [ -f "run_ci_tests.sh" ]; then
     sed -i 's/pyveda/vedart/g' run_ci_tests.sh
-    sed -i 's/PyVeda/VedaRT/g' run_ci_tests.sh
+    sed -i 's/VedaRT/VedaRT/g' run_ci_tests.sh
 fi
 
 echo ""

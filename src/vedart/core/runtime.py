@@ -1,4 +1,4 @@
-"""Global runtime management for PyVeda."""
+"""Global runtime management for VedaRT."""
 
 import atexit
 import logging
@@ -18,7 +18,7 @@ _runtime_lock = __import__("threading").Lock()
 class Runtime:
     """Global runtime managing scheduler, executors, and telemetry.
 
-    This is the central coordination point for PyVeda. It owns
+    This is the central coordination point for VedaRT. It owns
     the scheduler, all executors, and optional GPU/telemetry systems.
 
     Attributes:

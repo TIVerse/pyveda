@@ -5,7 +5,7 @@ import vedart as veda
 
 def main():
     """Demonstrate runtime configuration."""
-    print("PyVeda - Configuration Examples\n")
+    print("VedaRT - Configuration Examples\n")
     
     # Default configuration
     print("1. Default configuration:")

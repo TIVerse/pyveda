@@ -1,8 +1,8 @@
-"""Exception hierarchy for PyVeda."""
+"""Exception hierarchy for VedaRT."""
 
 
 class VedaError(Exception):
-    """Base exception for all PyVeda errors."""
+    """Base exception for all VedaRT errors."""
 
     pass
 

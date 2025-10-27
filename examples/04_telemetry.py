@@ -7,7 +7,7 @@ import vedart as veda
 
 def main():
     """Demonstrate telemetry features."""
-    print("PyVeda - Telemetry & Monitoring\n")
+    print("VedaRT - Telemetry & Monitoring\n")
     
     # Initialize with telemetry enabled
     config = veda.Config.builder().telemetry(True).build()
