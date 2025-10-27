@@ -4,7 +4,7 @@ import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from typing import Callable, List
 
-import pyveda as veda
+import vedart as veda
 
 
 def cpu_task(n: int) -> int:
@@ -71,7 +71,7 @@ def benchmark_framework(
     }
 
 
-def run_pyveda(tasks: List[int]) -> List[int]:
+def run_vedart(tasks: List[int]) -> List[int]:
     """Run tasks with VedaRT.
     
     Args:
@@ -142,7 +142,7 @@ def main():
         ("Sequential", run_sequential),
         ("ThreadPoolExecutor", run_thread_pool),
         ("ProcessPoolExecutor", run_process_pool),
-        ("VedaRT", run_pyveda),
+        ("VedaRT", run_vedart),
     ]
     
     results = []

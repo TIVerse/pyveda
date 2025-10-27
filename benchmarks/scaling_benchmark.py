@@ -3,7 +3,7 @@
 import time
 from typing import List, Tuple
 
-import pyveda as veda
+import vedart as veda
 
 
 def compute_task(n: int) -> int:

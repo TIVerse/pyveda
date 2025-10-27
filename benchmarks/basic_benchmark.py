@@ -2,7 +2,7 @@
 
 import time
 
-import pyveda as veda
+import vedart as veda
 
 
 def benchmark_parallel_sum(size):
