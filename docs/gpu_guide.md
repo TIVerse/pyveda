@@ -1,10 +1,10 @@
 # GPU Acceleration Guide
 
-Comprehensive guide to using GPU acceleration in PyVeda.
+Comprehensive guide to using GPU acceleration in VedaRT.
 
 ## Overview
 
-PyVeda provides automatic GPU offload for data-parallel operations with transparent CPU↔GPU data movement and intelligent cost-based decisions.
+VedaRT provides automatic GPU offload for data-parallel operations with transparent CPU↔GPU data movement and intelligent cost-based decisions.
 
 ## Installation
 
@@ -12,7 +12,7 @@ Install with GPU support:
 
 ```bash
 # For NVIDIA GPUs with CUDA
-pip install pyveda[gpu]
+pip install vedart[gpu]
 
 # This installs CuPy (recommended)
 # Alternative: install numba separately
@@ -25,7 +25,7 @@ The simplest way to use GPU acceleration is with the `@gpu` decorator:
 
 ```python
 import numpy as np
-import pyveda as veda
+import vedart as veda
 
 # Initialize with GPU enabled
 config = veda.Config.builder().gpu(True).build()
@@ -51,7 +51,7 @@ C_large = matrix_multiply(A_large, B_large)
 
 ### 1. Cost-Based Decision
 
-PyVeda evaluates whether GPU execution is beneficial:
+VedaRT evaluates whether GPU execution is beneficial:
 
 ```python
 def should_offload(func, args):
@@ -78,7 +78,7 @@ def should_offload(func, args):
 
 ### 3. Memory Management
 
-PyVeda uses a memory pool to reduce allocation overhead:
+VedaRT uses a memory pool to reduce allocation overhead:
 
 ```python
 # Memory pool automatically:
@@ -89,7 +89,7 @@ PyVeda uses a memory pool to reduce allocation overhead:
 
 ## Backend Selection
 
-PyVeda supports two GPU backends:
+VedaRT supports two GPU backends:
 
 ### CuPy (Recommended)
 

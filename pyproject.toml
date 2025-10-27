@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyveda"
+name = "vedart"
 version = "1.0.0"
 description = "Parallel runtime unifying Python's concurrency ecosystem"
 authors = [{name = "Ved", email = "ved@example.com"}]

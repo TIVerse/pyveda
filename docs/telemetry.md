@@ -1,15 +1,15 @@
 # Telemetry and Monitoring Guide
 
-Complete guide to observability in PyVeda.
+Complete guide to observability in VedaRT.
 
 ## Overview
 
-PyVeda includes a comprehensive telemetry system for monitoring task execution, performance metrics, and system health.
+VedaRT includes a comprehensive telemetry system for monitoring task execution, performance metrics, and system health.
 
 ## Enabling Telemetry
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 # Enable telemetry during initialization
 config = veda.Config.builder()\
@@ -94,15 +94,15 @@ server.serve_forever()
 Example Prometheus output:
 
 ```
-# HELP pyveda_tasks_executed_total Total tasks executed
-# TYPE pyveda_tasks_executed_total counter
-pyveda_tasks_executed_total 1523
+# HELP vedart_tasks_executed_total Total tasks executed
+# TYPE vedart_tasks_executed_total counter
+vedart_tasks_executed_total 1523
 
-# HELP pyveda_latency_ms Task latency in milliseconds
-# TYPE pyveda_latency_ms summary
-pyveda_latency_ms{quantile="0.5"} 12.5
-pyveda_latency_ms{quantile="0.95"} 45.2
-pyveda_latency_ms{quantile="0.99"} 89.1
+# HELP vedart_latency_ms Task latency in milliseconds
+# TYPE vedart_latency_ms summary
+vedart_latency_ms{quantile="0.5"} 12.5
+vedart_latency_ms{quantile="0.95"} 45.2
+vedart_latency_ms{quantile="0.99"} 89.1
 ```
 
 ### JSON
@@ -146,7 +146,7 @@ Output:
 Export to OpenTelemetry collectors:
 
 ```python
-from pyveda.telemetry import create_exporter
+from vedart.telemetry import create_exporter
 
 # Create OTLP exporter
 exporter = create_exporter('otlp', endpoint='http://localhost:4318')
@@ -168,7 +168,7 @@ requests.post(
 Track task execution with spans:
 
 ```python
-from pyveda.telemetry import TracingSystem
+from vedart.telemetry import TracingSystem
 
 tracing = TracingSystem()
 
@@ -194,7 +194,7 @@ otlp_format = tracing.export_otlp()
 Create custom counters, gauges, and histograms:
 
 ```python
-from pyveda.telemetry import Counter, Gauge, Histogram
+from vedart.telemetry import Counter, Gauge, Histogram
 
 # Counter for custom events
 requests_total = Counter('http_requests_total', 'Total HTTP requests')
@@ -259,7 +259,7 @@ def display_dashboard():
         snapshot = runtime.telemetry.snapshot()
         
         print("=" * 60)
-        print("PyVeda Live Dashboard")
+        print("VedaRT Live Dashboard")
         print("=" * 60)
         print(f"Tasks Executed: {snapshot.tasks_executed}")
         print(f"Tasks Failed:   {snapshot.tasks_failed}")
@@ -289,14 +289,14 @@ dashboard_thread.start()
 
 ### Grafana Dashboard
 
-1. Set up Prometheus to scrape PyVeda metrics
+1. Set up Prometheus to scrape VedaRT metrics
 2. Configure Grafana data source
 3. Create dashboard with panels:
 
 ```yaml
 # prometheus.yml
 scrape_configs:
-  - job_name: 'pyveda'
+  - job_name: 'vedart'
     static_configs:
       - targets: ['localhost:9090']
 ```
@@ -313,7 +313,7 @@ cloudwatch = boto3.client('cloudwatch')
 snapshot = runtime.telemetry.snapshot()
 
 cloudwatch.put_metric_data(
-    Namespace='PyVeda',
+    Namespace='VedaRT',
     MetricData=[
         {
             'MetricName': 'TasksExecuted',
@@ -345,9 +345,9 @@ initialize(statsd_host='localhost', statsd_port=8125)
 
 snapshot = runtime.telemetry.snapshot()
 
-statsd.gauge('pyveda.tasks.executed', snapshot.tasks_executed)
-statsd.gauge('pyveda.throughput', snapshot.throughput_tasks_per_sec)
-statsd.histogram('pyveda.latency', snapshot.avg_latency_ms)
+statsd.gauge('vedart.tasks.executed', snapshot.tasks_executed)
+statsd.gauge('vedart.throughput', snapshot.throughput_tasks_per_sec)
+statsd.histogram('vedart.latency', snapshot.avg_latency_ms)
 ```
 
 ## Performance Impact

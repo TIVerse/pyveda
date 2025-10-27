@@ -1,6 +1,6 @@
 """GPU acceleration example."""
 
-import pyveda as veda
+import vedart as veda
 
 
 @veda.gpu

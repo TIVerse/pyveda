@@ -3,7 +3,7 @@
 import time
 from typing import Dict, List
 
-import pyveda as veda
+import vedart as veda
 
 
 def extract_data(batch_id: int) -> List[Dict]:

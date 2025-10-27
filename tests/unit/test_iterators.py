@@ -1,6 +1,6 @@
 """Tests for parallel iterators."""
 
-from pyveda.iter.parallel import par_iter
+from vedart.iter.parallel import par_iter
 
 
 def test_par_iter_map(cleanup_runtime):

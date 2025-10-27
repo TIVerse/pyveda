@@ -1,6 +1,6 @@
 """Real-world data processing pipeline example."""
 
-import pyveda as veda
+import vedart as veda
 
 
 def extract_data(file_id):

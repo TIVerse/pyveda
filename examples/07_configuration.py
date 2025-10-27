@@ -1,6 +1,6 @@
 """Configuration and tuning example."""
 
-import pyveda as veda
+import vedart as veda
 
 
 def main():

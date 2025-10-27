@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyveda.core.task import Task, TaskPriority, TaskState
+from vedart.core.task import Task, TaskPriority, TaskState
 
 
 def test_task_creation():

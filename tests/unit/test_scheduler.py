@@ -1,9 +1,9 @@
 """Tests for scheduler functionality."""
 
-from pyveda.config import Config, ExecutorType
-from pyveda.core.scheduler import AdaptiveScheduler
-from pyveda.core.task import Task
-from pyveda.executors.thread_pool import ThreadPoolExecutor
+from vedart.config import Config, ExecutorType
+from vedart.core.scheduler import AdaptiveScheduler
+from vedart.core.task import Task
+from vedart.executors.thread_pool import ThreadPoolExecutor
 
 
 def test_scheduler_initialization():

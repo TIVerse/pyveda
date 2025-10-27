@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyveda.core.scope import scope
-from pyveda.iter.parallel import par_iter
+from vedart.core.scope import scope
+from vedart.iter.parallel import par_iter
 
 
 @pytest.mark.slow

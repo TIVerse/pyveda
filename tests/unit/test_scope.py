@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyveda.core.scope import scope, spawn
+from vedart.core.scope import scope, spawn
 
 
 def test_scope_spawn(cleanup_runtime):

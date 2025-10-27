@@ -2,7 +2,7 @@
 
 import pytest
 
-import pyveda as veda
+import vedart as veda
 
 
 def test_gpu_runtime_initialization():
@@ -65,7 +65,7 @@ def test_gpu_executor_registration():
     runtime = veda.get_runtime()
 
     if runtime.gpu and runtime.gpu.is_available():
-        from pyveda.config import ExecutorType
+        from vedart.config import ExecutorType
 
         # GPU executor should be registered
         gpu_executor = runtime.scheduler._executors.get(ExecutorType.GPU)

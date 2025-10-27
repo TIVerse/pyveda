@@ -1,19 +1,19 @@
-# PyVeda API Reference
+# VedaRT API Reference
 
-Complete API documentation for PyVeda.
+Complete API documentation for VedaRT.
 
 ## Core Functions
 
 ### `init(config: Optional[Config] = None) -> None`
 
-Initialize the PyVeda runtime.
+Initialize the VedaRT runtime.
 
 **Parameters:**
 - `config`: Optional configuration object. If None, uses defaults.
 
 **Example:**
 ```python
-import pyveda as veda
+import vedart as veda
 
 config = veda.Config.builder().threads(4).build()
 veda.init(config)
@@ -21,7 +21,7 @@ veda.init(config)
 
 ### `shutdown() -> None`
 
-Shutdown the PyVeda runtime and cleanup resources.
+Shutdown the VedaRT runtime and cleanup resources.
 
 **Example:**
 ```python
@@ -352,7 +352,7 @@ Context manager for deterministic execution.
 
 **Example:**
 ```python
-from pyveda.deterministic import deterministic
+from vedart.deterministic import deterministic
 
 with deterministic(seed=42, record=True) as trace:
     result = veda.par_iter(data).map(func).collect()
@@ -426,7 +426,7 @@ Scheduling policy enum.
 
 ### `VedaError`
 
-Base exception for all PyVeda errors.
+Base exception for all VedaRT errors.
 
 ### `SchedulerError`
 

@@ -29,20 +29,20 @@ jobs:
     
     - name: Lint with ruff
       run: |
-        ruff check src/pyveda tests
+        ruff check src/vedart tests
     
     - name: Format check with black
       run: |
-        black --check src/pyveda tests
+        black --check src/vedart tests
     
     - name: Type check with mypy
       run: |
-        mypy src/pyveda --strict
+        mypy src/vedart --strict
       continue-on-error: true
     
     - name: Run tests
       run: |
-        pytest tests/unit tests/integration -v --cov=src/pyveda --cov-report=xml
+        pytest tests/unit tests/integration -v --cov=src/vedart --cov-report=xml
     
     - name: Upload coverage
       uses: codecov/codecov-action@v4

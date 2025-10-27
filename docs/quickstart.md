@@ -1,21 +1,21 @@
-# PyVeda Quickstart Guide
+# VedaRT Quickstart Guide
 
-Get started with PyVeda in minutes.
+Get started with VedaRT in minutes.
 
 ## Installation
 
 ```bash
-pip install pyveda
+pip install vedart
 ```
 
 ### Optional Dependencies
 
 ```bash
 # For GPU support
-pip install pyveda[gpu]
+pip install vedart[gpu]
 
 # For development
-pip install pyveda[dev]
+pip install vedart[dev]
 ```
 
 ## Basic Usage
@@ -25,7 +25,7 @@ pip install pyveda[dev]
 Execute functions in parallel with automatic executor selection:
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 # Initialize runtime (optional, auto-initializes on first use)
 veda.init()
@@ -86,7 +86,7 @@ veda.init(config)
 
 ### 1. Adaptive Scheduling
 
-PyVeda automatically selects the best executor (threads, processes, async, GPU) based on:
+VedaRT automatically selects the best executor (threads, processes, async, GPU) based on:
 - Task characteristics (CPU-bound, IO-bound, async)
 - System load
 - GPU availability

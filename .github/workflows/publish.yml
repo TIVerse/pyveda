@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pyveda
+      url: https://pypi.org/p/vedart
     permissions:
       id-token: write  # Required for trusted publishing
     
@@ -67,7 +67,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/pyveda
+      url: https://test.pypi.org/p/vedart
     permissions:
       id-token: write
     

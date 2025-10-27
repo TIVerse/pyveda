@@ -1,16 +1,16 @@
-# PyVeda Documentation
+# VedaRT Documentation
 
-Welcome to PyVeda - A unified Python parallel runtime with adaptive scheduling, GPU acceleration, and comprehensive observability.
+Welcome to VedaRT - A unified Python parallel runtime with adaptive scheduling, GPU acceleration, and comprehensive observability.
 
 ## Getting Started
 
 - **[Quickstart Guide](quickstart.md)** - Get up and running in 5 minutes
-- **[Installation](quickstart.md#installation)** - Install PyVeda and dependencies
+- **[Installation](quickstart.md#installation)** - Install VedaRT and dependencies
 - **[Basic Examples](../examples/)** - Working code examples
 
 ## Core Concepts
 
-- **[Architecture Overview](architecture.md)** - Understand PyVeda's design
+- **[Architecture Overview](architecture.md)** - Understand VedaRT's design
 - **[API Reference](api_reference.md)** - Complete API documentation
 - **[Configuration](quickstart.md#configuration-options)** - Runtime configuration options
 
@@ -45,7 +45,7 @@ Welcome to PyVeda - A unified Python parallel runtime with adaptive scheduling, 
 ### Quick Example
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 # Parallel data processing
 result = veda.par_iter(range(1000))\
@@ -124,12 +124,12 @@ print(f"P99 Latency: {snapshot.p99_latency_ms:.2f}ms")
 
 - Deterministic execution
 - Replay traces
-- Unit testing with PyVeda
+- Unit testing with VedaRT
 - Performance profiling
 
 ## Community
 
-- **GitHub**: [https://github.com/yourusername/pyveda](https://github.com/yourusername/pyveda)
+- **GitHub**: [https://github.com/yourusername/vedart](https://github.com/yourusername/vedart)
 - **Issues**: Report bugs and request features
 - **Discussions**: Ask questions and share ideas
 
@@ -139,7 +139,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ## License
 
-PyVeda is released under the MIT License. See [LICENSE](../LICENSE) for details.
+VedaRT is released under the MIT License. See [LICENSE](../LICENSE) for details.
 
 ## Changelog
 

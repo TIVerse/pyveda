@@ -2,7 +2,7 @@
 
 import asyncio
 
-import pyveda as veda
+import vedart as veda
 
 
 async def async_double(x):
@@ -19,7 +19,7 @@ async def async_is_even(x):
 
 def test_async_task_detection():
     """Test automatic async task detection."""
-    from pyveda.core.task import Task
+    from vedart.core.task import Task
 
     # Sync function
     sync_task = Task(func=lambda x: x * 2, args=(5,))
@@ -126,7 +126,7 @@ def test_async_executor_routing():
     stats = runtime.scheduler.get_stats()
 
     # Should have async executor stats
-    from pyveda.config import ExecutorType
+    from vedart.config import ExecutorType
 
     if ExecutorType.ASYNC in runtime.scheduler._executors:
         assert "async" in stats["executors"] or ExecutorType.ASYNC in stats["executors"]

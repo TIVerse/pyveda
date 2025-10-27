@@ -3,7 +3,7 @@
 set -e  # Exit on any error
 
 echo "========================================"
-echo "Running PyVeda CI Tests Locally"
+echo "Running VedaRT CI Tests Locally"
 echo "========================================"
 echo ""
 
@@ -40,7 +40,7 @@ echo ""
 echo "========================================"
 echo "Step 2: Linting with ruff"
 echo "========================================"
-if ruff check src/pyveda tests; then
+if ruff check src/vedart tests; then
     echo -e "${GREEN}✓ Ruff check passed${NC}"
 else
     echo -e "${RED}✗ Ruff check failed${NC}"
@@ -52,11 +52,11 @@ echo ""
 echo "========================================"
 echo "Step 3: Format check with black"
 echo "========================================"
-if black --check src/pyveda tests; then
+if black --check src/vedart tests; then
     echo -e "${GREEN}✓ Black format check passed${NC}"
 else
     echo -e "${YELLOW}⚠ Black format check failed - files need formatting${NC}"
-    echo "Run 'black src/pyveda tests' to fix formatting"
+    echo "Run 'black src/vedart tests' to fix formatting"
     exit 1
 fi
 echo ""
@@ -65,7 +65,7 @@ echo ""
 echo "========================================"
 echo "Step 4: Type check with mypy"
 echo "========================================"
-if mypy src/pyveda --strict; then
+if mypy src/vedart --strict; then
     echo -e "${GREEN}✓ MyPy type check passed${NC}"
 else
     echo -e "${YELLOW}⚠ MyPy found issues (continuing as per CI config)${NC}"
@@ -76,7 +76,7 @@ echo ""
 echo "========================================"
 echo "Step 5: Running unit & integration tests"
 echo "========================================"
-if pytest tests/unit tests/integration -v --cov=src/pyveda --cov-report=term-missing; then
+if pytest tests/unit tests/integration -v --cov=src/vedart --cov-report=term-missing; then
     echo -e "${GREEN}✓ Unit & integration tests passed${NC}"
 else
     echo -e "${RED}✗ Unit & integration tests failed${NC}"

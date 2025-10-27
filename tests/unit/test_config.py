@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyveda.config import Config, SchedulingPolicy
+from vedart.config import Config, SchedulingPolicy
 
 
 def test_config_default():

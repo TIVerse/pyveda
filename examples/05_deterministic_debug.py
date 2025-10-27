@@ -2,7 +2,7 @@
 
 import random
 
-import pyveda as veda
+import vedart as veda
 
 
 def flaky_computation(seed_offset):

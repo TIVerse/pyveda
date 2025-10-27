@@ -1,7 +1,7 @@
 """Tests for deterministic execution."""
 
-from pyveda.deterministic.replay import deterministic
-from pyveda.iter.parallel import par_iter
+from vedart.deterministic.replay import deterministic
+from vedart.iter.parallel import par_iter
 
 
 def test_deterministic_mode(cleanup_runtime):

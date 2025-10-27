@@ -1,4 +1,4 @@
-# PyVeda - Complete Technical Specification Brief
+# VedaRT - Complete Technical Specification Brief
 
 **Version:** 1.0.0  
 **Status:** Implementation-Ready  
@@ -10,9 +10,9 @@
 
 ## 1. Executive Summary
 
-### 1.1 What is PyVeda?
+### 1.1 What is VedaRT?
 
-PyVeda (Python Versatile Execution and Dynamic Adaptation) is a parallel runtime library that unifies Python's fragmented concurrency ecosystem under a single adaptive, observable, and deterministic execution layer. It is the Python counterpart to the Rust project `veda-rs`, providing a drop-in replacement for Ray, Dask, and asyncio with superior ergonomics and performance.
+VedaRT (Python Versatile Execution and Dynamic Adaptation) is a parallel runtime library that unifies Python's fragmented concurrency ecosystem under a single adaptive, observable, and deterministic execution layer. It is the Python counterpart to the Rust project `veda-rs`, providing a drop-in replacement for Ray, Dask, and asyncio with superior ergonomics and performance.
 
 ### 1.2 The Problem
 
@@ -34,12 +34,12 @@ Python's concurrency landscape is severely fragmented:
 - ✅ Deterministic replay for testing
 - ✅ Rich telemetry and observability
 
-### 1.3 The Solution: PyVeda
+### 1.3 The Solution: VedaRT
 
-PyVeda provides:
+VedaRT provides:
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 # Simple parallel map - automatically optimized
 result = veda.par_iter(range(1000)).map(lambda x: x * 2).collect()
@@ -69,7 +69,7 @@ veda.telemetry.snapshot().export("metrics.json")
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    PyVeda Runtime                        │
+│                    VedaRT Runtime                        │
 ├─────────────────────────────────────────────────────────┤
 │                                                          │
 │  ┌─────────────┐              ┌──────────────┐         │
@@ -100,31 +100,31 @@ veda.telemetry.snapshot().export("metrics.json")
 
 ### 2.2 Key Components
 
-#### **Adaptive Scheduler** (`pyveda/core/scheduler.py`)
+#### **Adaptive Scheduler** (`vedart/core/scheduler.py`)
 - **Dynamic Scaling**: Adjusts workers based on CPU load, queue depth, latency
 - **Smart Routing**: Selects optimal executor (thread/process/GPU) per task
 - **Work Stealing**: Lock-free queues for high throughput
 - **Priority Scheduling**: Support for deadlines and priorities
 
-#### **Executor Layer** (`pyveda/executors/`)
+#### **Executor Layer** (`vedart/executors/`)
 - **ThreadPoolExecutor**: I/O-bound, GIL-released tasks
 - **ProcessPoolExecutor**: CPU-bound pure Python
 - **AsyncIOExecutor**: Native asyncio integration
 - **GPUExecutor**: CuPy/Numba kernel dispatch
 
-#### **Telemetry System** (`pyveda/telemetry/`)
+#### **Telemetry System** (`vedart/telemetry/`)
 - **Metrics**: Counters, histograms, gauges (<1% overhead)
 - **Tracing**: Span-based execution tracing
 - **Export**: Prometheus, JSON, OpenTelemetry
 - **Feedback Loop**: Real-time adaptation
 
-#### **GPU Runtime** (`pyveda/gpu/`)
+#### **GPU Runtime** (`vedart/gpu/`)
 - **Auto-detection**: CuPy, Numba compatibility
 - **Smart Offload**: Cost model for CPU↔GPU decisions
 - **Memory Management**: Pooled GPU buffers
 - **Multi-GPU**: Automatic distribution
 
-#### **Deterministic Mode** (`pyveda/deterministic/`)
+#### **Deterministic Mode** (`vedart/deterministic/`)
 - **Seeded Scheduling**: Reproducible task ordering
 - **Replay System**: Record and replay executions
 - **Test Isolation**: Per-test random state
@@ -134,7 +134,7 @@ veda.telemetry.snapshot().export("metrics.json")
 ## 3. Complete Project Structure
 
 ```
-pyveda/
+vedart/
 ├── pyproject.toml                    # PEP 621 metadata
 ├── README.md                         # User documentation
 ├── LICENSE                           # MIT License
@@ -146,7 +146,7 @@ pyveda/
 │       ├── benchmarks.yml            # Performance regression detection
 │       └── publish.yml               # PyPI publication
 │
-├── src/pyveda/
+├── src/vedart/
 │   ├── __init__.py                   # Public API exports
 │   ├── __version__.py                # Version: 1.0.0
 │   ├── config.py                     # Configuration system
@@ -272,11 +272,11 @@ pyveda/
 
 ## 4. Public API Design
 
-### 4.1 Core API (`pyveda/__init__.py`)
+### 4.1 Core API (`vedart/__init__.py`)
 
 ```python
 """
-PyVeda - Versatile Execution and Dynamic Adaptation Runtime
+VedaRT - Versatile Execution and Dynamic Adaptation Runtime
 
 A unified parallel computing framework for Python providing:
 - Adaptive scheduling across threads, processes, async, and GPU
@@ -285,17 +285,17 @@ A unified parallel computing framework for Python providing:
 - High performance and reliability
 
 Example:
-    >>> import pyveda as veda
+    >>> import vedart as veda
     >>> result = veda.par_iter(range(1000)).map(lambda x: x**2).sum()
 """
 
-from pyveda.__version__ import __version__
-from pyveda.config import Config, SchedulingPolicy
-from pyveda.core.runtime import init, shutdown, get_runtime
-from pyveda.core.scope import scope, spawn
-from pyveda.iter.parallel import par_iter
-from pyveda.gpu.decorators import gpu, gpu_kernel
-from pyveda.telemetry import telemetry
+from vedart.__version__ import __version__
+from vedart.config import Config, SchedulingPolicy
+from vedart.core.runtime import init, shutdown, get_runtime
+from vedart.core.scope import scope, spawn
+from vedart.iter.parallel import par_iter
+from vedart.gpu.decorators import gpu, gpu_kernel
+from vedart.telemetry import telemetry
 
 __all__ = [
     # Version
@@ -339,7 +339,7 @@ def _auto_init():
 _auto_init()
 ```
 
-### 4.2 Configuration (`pyveda/config.py`)
+### 4.2 Configuration (`vedart/config.py`)
 
 ```python
 from dataclasses import dataclass, field
@@ -357,7 +357,7 @@ class SchedulingPolicy(Enum):
 
 @dataclass
 class Config:
-    """PyVeda runtime configuration.
+    """VedaRT runtime configuration.
     
     Examples:
         >>> config = Config.builder() \\
@@ -447,7 +447,7 @@ class ConfigBuilder:
         return self._config
 ```
 
-### 4.3 Parallel Iterator (`pyveda/iter/parallel.py`)
+### 4.3 Parallel Iterator (`vedart/iter/parallel.py`)
 
 ```python
 from typing import TypeVar, Generic, Callable, Iterable, Optional, List, Dict
@@ -600,14 +600,14 @@ def par_iter(
         ParallelIterator for chaining
     
     Examples:
-        >>> import pyveda as veda
+        >>> import vedart as veda
         >>> veda.par_iter(range(100)).map(lambda x: x**2).sum()
         328350
     """
     return ParallelIterator(iterable, chunk_size, ordered)
 ```
 
-### 4.4 GPU Decorators (`pyveda/gpu/decorators.py`)
+### 4.4 GPU Decorators (`vedart/gpu/decorators.py`)
 
 ```python
 from typing import Callable, TypeVar, Any
@@ -679,7 +679,7 @@ def gpu_kernel(
     return decorator
 ```
 
-### 4.5 Scoped Execution (`pyveda/core/scope.py`)
+### 4.5 Scoped Execution (`vedart/core/scope.py`)
 
 ```python
 from typing import Callable, TypeVar, Any, ContextManager
@@ -776,7 +776,7 @@ def spawn(func: Callable[[], T]) -> Future[T]:
     return runtime.scheduler.submit(Task(func))
 ```
 
-### 4.6 Telemetry (`pyveda/telemetry/__init__.py`)
+### 4.6 Telemetry (`vedart/telemetry/__init__.py`)
 
 ```python
 from dataclasses import dataclass
@@ -799,7 +799,7 @@ class MetricsSnapshot:
     
     def print_summary(self):
         """Print human-readable summary."""
-        print(f"PyVeda Metrics Snapshot ({time.ctime(self.timestamp)})")
+        print(f"VedaRT Metrics Snapshot ({time.ctime(self.timestamp)})")
         print(f"  Tasks Executed: {self.tasks_executed:,}")
         print(f"  Tasks Pending: {self.tasks_pending:,}")
         print(f"  Avg Latency: {self.avg_latency_ms:.2f}ms")
@@ -895,7 +895,7 @@ def get_telemetry() -> Telemetry:
     """Get global telemetry instance."""
     global telemetry
     if telemetry is None:
-        from pyveda.core.runtime import get_runtime
+        from vedart.core.runtime import get_runtime
         telemetry = Telemetry(get_runtime())
     return telemetry
 
@@ -910,7 +910,7 @@ telemetry = get_telemetry()
 ### 5.1 Adaptive Scheduler Algorithm
 
 ```python
-# src/pyveda/core/scheduler.py (excerpt)
+# src/vedart/core/scheduler.py (excerpt)
 
 class AdaptiveScheduler:
     """Adaptive task scheduler with dynamic optimization.
@@ -1010,7 +1010,7 @@ class AdaptiveScheduler:
 ### 5.2 GPU Integration Strategy
 
 ```python
-# src/pyveda/gpu/backend.py (excerpt)
+# src/vedart/gpu/backend.py (excerpt)
 
 class GPURuntime:
     """GPU runtime with CuPy/Numba backend."""
@@ -1119,7 +1119,7 @@ class GPURuntime:
 ### 5.3 Deterministic Execution
 
 ```python
-# src/pyveda/deterministic/scheduler.py (excerpt)
+# src/vedart/deterministic/scheduler.py (excerpt)
 
 class DeterministicScheduler:
     """Deterministic task scheduler for reproducible execution.
@@ -1202,7 +1202,7 @@ def deterministic(seed: int):
 
 ### 6.1 Comprehensive Comparison
 
-| Feature | PyVeda | Ray | Dask | asyncio | Joblib |
+| Feature | VedaRT | Ray | Dask | asyncio | Joblib |
 |---------|--------|-----|------|---------|--------|
 | **Setup Complexity** | ✅ Zero | ❌ High | ⚠️ Medium | ✅ Zero | ✅ Zero |
 | **Parallel Iterators** | ✅ Native | ❌ No | ⚠️ Limited | ❌ No | ⚠️ Basic |
@@ -1245,7 +1245,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyveda"
+name = "vedart"
 version = "1.0.0"
 description = "Versatile Execution and Dynamic Adaptation runtime for Python"
 readme = "README.md"
@@ -1299,17 +1299,17 @@ docs = [
     "mkdocs-material>=9.4.0",
     "mkdocstrings[python]>=0.24.0",
 ]
-all = ["pyveda[gpu,telemetry,dev,docs]"]
+all = ["vedart[gpu,telemetry,dev,docs]"]
 
 [project.urls]
-Homepage = "https://github.com/TIVerse/pyveda"
-Documentation = "https://pyveda.readthedocs.io"
-Repository = "https://github.com/TIVerse/pyveda"
-Changelog = "https://github.com/TIVerse/pyveda/blob/master/CHANGELOG.md"
-"Bug Tracker" = "https://github.com/TIVerse/pyveda/issues"
+Homepage = "https://github.com/TIVerse/vedart"
+Documentation = "https://vedart.readthedocs.io"
+Repository = "https://github.com/TIVerse/vedart"
+Changelog = "https://github.com/TIVerse/vedart/blob/master/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/TIVerse/vedart/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyveda"]
+packages = ["src/vedart"]
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -1331,7 +1331,7 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=pyveda",
+    "--cov=vedart",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
@@ -1374,7 +1374,7 @@ target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 
 [tool.coverage.run]
-source = ["pyveda"]
+source = ["vedart"]
 omit = [
     "*/tests/*",
     "*/benchmarks/*",
@@ -1396,17 +1396,17 @@ exclude_lines = [
 ### 7.2 README.md Structure
 
 ```markdown
-# PyVeda
+# VedaRT
 
-[![PyPI](https://img.shields.io/pypi/v/pyveda.svg)](https://pypi.org/project/pyveda/)
-[![Python](https://img.shields.io/pypi/pyversions/pyveda.svg)](https://pypi.org/project/pyveda/)
-[![Tests](https://github.com/TIVerse/pyveda/workflows/tests/badge.svg)](https://github.com/TIVerse/pyveda/actions)
-[![Coverage](https://codecov.io/gh/TIVerse/pyveda/branch/main/graph/badge.svg)](https://codecov.io/gh/TIVerse/pyveda)
-[![License](https://img.shields.io/github/license/TIVerse/pyveda.svg)](https://github.com/TIVerse/pyveda/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/vedart.svg)](https://pypi.org/project/vedart/)
+[![Python](https://img.shields.io/pypi/pyversions/vedart.svg)](https://pypi.org/project/vedart/)
+[![Tests](https://github.com/TIVerse/vedart/workflows/tests/badge.svg)](https://github.com/TIVerse/vedart/actions)
+[![Coverage](https://codecov.io/gh/TIVerse/vedart/branch/main/graph/badge.svg)](https://codecov.io/gh/TIVerse/vedart)
+[![License](https://img.shields.io/github/license/TIVerse/vedart.svg)](https://github.com/TIVerse/vedart/blob/main/LICENSE)
 
 **Versatile Execution and Dynamic Adaptation runtime for Python**
 
-PyVeda unifies Python's fragmented concurrency ecosystem into a single adaptive runtime with:
+VedaRT unifies Python's fragmented concurrency ecosystem into a single adaptive runtime with:
 - 🚀 **Zero-setup** parallel execution
 - 🧠 **Adaptive scheduling** that tunes itself
 - 🎯 **GPU acceleration** with automatic fallback
@@ -1418,11 +1418,11 @@ PyVeda unifies Python's fragmented concurrency ecosystem into a single adaptive 
 ## Quick Start
 
 ```bash
-pip install pyveda
+pip install vedart
 ```
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 # Parallel map-reduce
 result = (
@@ -1454,7 +1454,7 @@ veda.par_iter(data).async_map(io_fn).collect() # Async I/O
 ```
 
 ### Adaptive Scheduling
-PyVeda monitors CPU load, queue depth, and latency to automatically adjust:
+VedaRT monitors CPU load, queue depth, and latency to automatically adjust:
 - Worker pool size (threads/processes)
 - Executor selection (thread/process/GPU)
 - Chunk sizes for optimal throughput
@@ -1492,34 +1492,34 @@ snapshot.export_json("metrics.json")
 
 **Minimal:**
 ```bash
-pip install pyveda
+pip install vedart
 ```
 
 **With GPU support:**
 ```bash
-pip install pyveda[gpu]
+pip install vedart[gpu]
 ```
 
 **Full (dev + docs):**
 ```bash
-pip install pyveda[all]
+pip install vedart[all]
 ```
 
 ---
 
 ## Documentation
 
-- [Quick Start](https://pyveda.readthedocs.io/quickstart/)
-- [API Reference](https://pyveda.readthedocs.io/api/)
-- [Architecture](https://pyveda.readthedocs.io/architecture/)
-- [GPU Guide](https://pyveda.readthedocs.io/gpu/)
-- [Examples](https://github.com/TIVerse/pyveda/tree/main/examples)
+- [Quick Start](https://vedart.readthedocs.io/quickstart/)
+- [API Reference](https://vedart.readthedocs.io/api/)
+- [Architecture](https://vedart.readthedocs.io/architecture/)
+- [GPU Guide](https://vedart.readthedocs.io/gpu/)
+- [Examples](https://github.com/TIVerse/vedart/tree/main/examples)
 
 ---
 
 ## Comparison
 
-| Feature | PyVeda | Ray | Dask | asyncio |
+| Feature | VedaRT | Ray | Dask | asyncio |
 |---------|--------|-----|------|---------|
 | Setup | Zero | Complex | Medium | Zero |
 | GPU | Auto | Manual | Limited | No |
@@ -1527,7 +1527,7 @@ pip install pyveda[all]
 | Deterministic | Yes | No | No | No |
 | Telemetry | Rich | Basic | Basic | No |
 
-[Full comparison →](https://pyveda.readthedocs.io/comparison/)
+[Full comparison →](https://vedart.readthedocs.io/comparison/)
 
 ---
 
@@ -1535,13 +1535,13 @@ pip install pyveda[all]
 
 ```
 Workload: 1M element map-reduce
-- PyVeda:  187ms (adaptive, 8 workers)
+- VedaRT:  187ms (adaptive, 8 workers)
 - Ray:     245ms (manual tuning)
 - Dask:    312ms (default config)
 - Joblib:  421ms (n_jobs=8)
 ```
 
-[See all benchmarks →](https://github.com/TIVerse/pyveda/tree/main/benchmarks)
+[See all benchmarks →](https://github.com/TIVerse/vedart/tree/main/benchmarks)
 
 ---
 
@@ -1564,11 +1564,11 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Citation
 
 ```bibtex
-@software{pyveda2025,
+@software{vedart2025,
   author = {TIVerse Python Team},
-  title = {PyVeda: Versatile Execution and Dynamic Adaptation for Python},
+  title = {VedaRT: Versatile Execution and Dynamic Adaptation for Python},
   year = {2025},
-  url = {https://github.com/TIVerse/pyveda}
+  url = {https://github.com/TIVerse/vedart}
 }
 ```
 
@@ -1587,11 +1587,11 @@ MIT License - see [LICENSE](LICENSE) for details.
 # tests/conftest.py
 
 import pytest
-import pyveda as veda
+import vedart as veda
 
 @pytest.fixture(scope="session")
 def veda_runtime():
-    """Initialize PyVeda for testing."""
+    """Initialize VedaRT for testing."""
     config = veda.Config.builder() \
         .num_threads(4) \
         .enable_telemetry(True) \
@@ -1614,7 +1614,7 @@ def deterministic_runtime():
 def mock_gpu():
     """Mock GPU for testing without hardware."""
     from unittest.mock import Mock, patch
-    with patch('pyveda.gpu.backend.GPURuntime._detect_gpu', return_value=True):
+    with patch('vedart.gpu.backend.GPURuntime._detect_gpu', return_value=True):
         yield Mock()
 ```
 
@@ -1767,7 +1767,7 @@ jobs:
         run: mypy src/
       
       - name: Test with pytest
-        run: pytest --cov=pyveda --cov-report=xml
+        run: pytest --cov=vedart --cov-report=xml
       
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -1893,7 +1893,7 @@ Basic parallel iteration example.
 Demonstrates: par_iter, map, collect
 """
 
-import pyveda as veda
+import vedart as veda
 
 def square(x):
     return x ** 2
@@ -1927,7 +1927,7 @@ Async integration example.
 Demonstrates: async_map, hybrid execution
 """
 
-import pyveda as veda
+import vedart as veda
 import asyncio
 import aiohttp
 
@@ -1970,7 +1970,7 @@ GPU acceleration example.
 Demonstrates: @gpu decorator, automatic fallback
 """
 
-import pyveda as veda
+import vedart as veda
 import numpy as np
 
 @veda.gpu
@@ -2022,7 +2022,7 @@ Machine learning pipeline example.
 Demonstrates: hybrid CPU/GPU, adaptive scheduling
 """
 
-import pyveda as veda
+import vedart as veda
 import numpy as np
 from typing import List, Tuple
 
@@ -2096,7 +2096,7 @@ Deterministic debugging example.
 Demonstrates: reproducible execution, trace recording
 """
 
-import pyveda as veda
+import vedart as veda
 import random
 
 def flaky_computation(x):
@@ -2275,7 +2275,7 @@ if __name__ == "__main__":
 
 ### 12.4 Scaling Benchmarks
 
-| Cores | Efficiency | Linear | PyVeda |
+| Cores | Efficiency | Linear | VedaRT |
 |-------|-----------|--------|--------|
 | 1 | 100% | 1.0x | 1.0x |
 | 2 | >95% | 2.0x | 1.98x |
@@ -2360,8 +2360,8 @@ def task(x):
 futures = [task.remote(i) for i in range(100)]
 results = ray.get(futures)
 
-# PyVeda
-import pyveda as veda
+# VedaRT
+import vedart as veda
 
 def task(x):
     return x * 2
@@ -2378,8 +2378,8 @@ import dask.bag as db
 bag = db.from_sequence(range(100))
 results = bag.map(lambda x: x * 2).compute()
 
-# PyVeda
-import pyveda as veda
+# VedaRT
+import vedart as veda
 
 results = veda.par_iter(range(100)).map(lambda x: x * 2).collect()
 ```
@@ -2394,8 +2394,8 @@ results = Parallel(n_jobs=8)(
     delayed(lambda x: x * 2)(i) for i in range(100)
 )
 
-# PyVeda
-import pyveda as veda
+# VedaRT
+import vedart as veda
 
 results = veda.par_iter(range(100)).map(lambda x: x * 2).collect()
 ```
@@ -2409,8 +2409,8 @@ from multiprocessing import Pool
 with Pool(8) as pool:
     results = pool.map(lambda x: x * 2, range(100))
 
-# PyVeda
-import pyveda as veda
+# VedaRT
+import vedart as veda
 
 results = veda.par_iter(range(100)).map(lambda x: x * 2).collect()
 ```
@@ -2423,8 +2423,8 @@ results = veda.par_iter(range(100)).map(lambda x: x * 2).collect()
 
 ```bash
 # Clone repository
-git clone https://github.com/TIVerse/pyveda.git
-cd pyveda
+git clone https://github.com/TIVerse/vedart.git
+cd vedart
 
 # Create virtual environment
 python -m venv venv
@@ -2496,7 +2496,7 @@ Clear description of the bug
 
 ## To Reproduce
 ```python
-import pyveda as veda
+import vedart as veda
 # Minimal reproducible example
 ```
 
@@ -2507,7 +2507,7 @@ What you expected to happen
 What actually happened
 
 ## Environment
-- PyVeda version: 1.0.0
+- VedaRT version: 1.0.0
 - Python version: 3.11.5
 - OS: Ubuntu 22.04
 - GPU: NVIDIA RTX 3090 (if relevant)
@@ -2548,7 +2548,7 @@ SOFTWARE.
 
 ### 16.2 Acknowledgments
 
-PyVeda builds upon foundational work from:
+VedaRT builds upon foundational work from:
 
 - **Rayon (Rust)** - Data parallelism API design
 - **Ray** - Distributed scheduling concepts
@@ -2562,12 +2562,12 @@ Special thanks to the Python community for feedback and contributions.
 ### 16.3 Citation
 
 ```bibtex
-@software{pyveda2025,
+@software{vedart2025,
   author = {TIVerse Python Team},
-  title = {PyVeda: Versatile Execution and Dynamic Adaptation for Python},
+  title = {VedaRT: Versatile Execution and Dynamic Adaptation for Python},
   year = {2025},
   version = {1.0.0},
-  url = {https://github.com/TIVerse/pyveda},
+  url = {https://github.com/TIVerse/vedart},
   doi = {10.5281/zenodo.xxxxx}
 }
 ```
@@ -2578,23 +2578,23 @@ Special thanks to the Python community for feedback and contributions.
 
 ### 17.1 Getting Help
 
-- **Documentation**: https://pyveda.readthedocs.io
-- **GitHub Issues**: https://github.com/TIVerse/pyveda/issues
-- **Discussions**: https://github.com/TIVerse/pyveda/discussions
-- **Stack Overflow**: Tag questions with `pyveda`
+- **Documentation**: https://vedart.readthedocs.io
+- **GitHub Issues**: https://github.com/TIVerse/vedart/issues
+- **Discussions**: https://github.com/TIVerse/vedart/discussions
+- **Stack Overflow**: Tag questions with `vedart`
 - **Email**: eshanized@proton.me
 
 ### 17.2 Communication Channels
 
-- **Discord**: https://discord.gg/pyveda (planned)
-- **Twitter**: @PyVeda_Official (planned)
-- **Mailing List**: pyveda-users@googlegroups.com (planned)
+- **Discord**: https://discord.gg/vedart (planned)
+- **Twitter**: @VedaRT_Official (planned)
+- **Mailing List**: vedart-users@googlegroups.com (planned)
 
 ### 17.3 Commercial Support
 
 For enterprise support, consulting, and custom development:
 - Email: eshanized@proton.me
-- Website: https://pyveda.io (planned)
+- Website: https://vedart.io (planned)
 
 ---
 
@@ -2612,19 +2612,19 @@ For enterprise support, consulting, and custom development:
 
 ### 18.2 FAQ
 
-**Q: Does PyVeda eliminate the GIL?**
+**Q: Does VedaRT eliminate the GIL?**
 A: No, but it works around it using processes for CPU-bound tasks and GPU for compatible workloads.
 
-**Q: Is PyVeda ready for use?**
+**Q: Is VedaRT ready for use?**
 A: Yes, v1.0.0 is thoroughly tested and ready to use.
 
-**Q: Can I use PyVeda with Ray/Dask?**
-A: Yes, PyVeda can coexist with other libraries, but provides a simpler alternative for most use cases.
+**Q: Can I use VedaRT with Ray/Dask?**
+A: Yes, VedaRT can coexist with other libraries, but provides a simpler alternative for most use cases.
 
-**Q: Does PyVeda support distributed computing?**
+**Q: Does VedaRT support distributed computing?**
 A: Not in v1.0. Multi-node support is planned for v2.0.
 
-**Q: What's the overhead of using PyVeda?**
+**Q: What's the overhead of using VedaRT?**
 A: Task spawn overhead is ~85ns, with <5% total overhead vs raw threading for most workloads.
 
 **Q: How does deterministic mode work?**
@@ -2647,7 +2647,7 @@ config = veda.Config.builder() \
 **Issue: GPU not detected**
 ```python
 # Check GPU availability
-import pyveda as veda
+import vedart as veda
 runtime = veda.get_runtime()
 print(f"GPU available: {runtime.gpu_available()}")
 
@@ -2667,7 +2667,7 @@ with veda.scope() as s:
 
 ## 19. Conclusion
 
-PyVeda represents a **complete reimagining** of parallel computing for Python. By unifying fragmented ecosystems, providing adaptive optimization, and maintaining high quality, PyVeda enables developers to:
+VedaRT represents a **complete reimagining** of parallel computing for Python. By unifying fragmented ecosystems, providing adaptive optimization, and maintaining high quality, VedaRT enables developers to:
 
 ✅ **Write less code** - Simple, intuitive API  
 ✅ **Run faster** - Adaptive scheduling and GPU acceleration  
@@ -2677,16 +2677,16 @@ PyVeda represents a **complete reimagining** of parallel computing for Python. B
 **Ready to get started?**
 
 ```bash
-pip install pyveda
+pip install vedart
 ```
 
 ```python
-import pyveda as veda
+import vedart as veda
 
 result = veda.par_iter(data).map(process).collect()
 ```
 
-**Join the PyVeda community and help shape the future of parallel Python!**
+**Join the VedaRT community and help shape the future of parallel Python!**
 
 ---
 
@@ -2697,9 +2697,9 @@ result = veda.par_iter(data).map(process).collect()
 **Word Count:** ~15,000  
 
 **Contact:** eshanized@proton.me  
-**Repository:** https://github.com/TIVerse/pyveda  
+**Repository:** https://github.com/TIVerse/vedart  
 **License:** MIT
 
 ---
 
-*This document serves as the complete technical specification for PyVeda v1.0.0. All components are ready for immediate implementation.*
+*This document serves as the complete technical specification for VedaRT v1.0.0. All components are ready for immediate implementation.*

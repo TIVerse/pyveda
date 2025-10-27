@@ -5,7 +5,7 @@ import gc
 import psutil
 import pytest
 
-from pyveda.iter.parallel import par_iter
+from vedart.iter.parallel import par_iter
 
 
 def get_memory_mb():
@@ -39,7 +39,7 @@ def test_no_memory_leak_iterations(cleanup_runtime):
 @pytest.mark.slow
 def test_no_memory_leak_scopes(cleanup_runtime):
     """Test for memory leaks in scopes."""
-    from pyveda.core.scope import scope
+    from vedart.core.scope import scope
 
     # Warm up
     for _ in range(10):

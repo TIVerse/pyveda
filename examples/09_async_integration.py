@@ -3,7 +3,7 @@
 import asyncio
 import time
 
-import pyveda as veda
+import vedart as veda
 
 
 async def async_fetch(url: str) -> dict:

@@ -2,7 +2,7 @@
 
 import time
 
-import pyveda as veda
+import vedart as veda
 
 
 def load_data_batch(batch_id):

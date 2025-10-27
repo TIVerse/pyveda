@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyveda.config import Config
-from pyveda.core.runtime import Runtime, shutdown
+from vedart.config import Config
+from vedart.core.runtime import Runtime, shutdown
 
 
 @pytest.fixture(scope="function")

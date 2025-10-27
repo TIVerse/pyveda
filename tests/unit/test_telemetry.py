@@ -2,7 +2,7 @@
 
 import time
 
-from pyveda.telemetry.metrics import Counter, Gauge, Histogram, MetricsSnapshot
+from vedart.telemetry.metrics import Counter, Gauge, Histogram, MetricsSnapshot
 
 
 def test_counter():

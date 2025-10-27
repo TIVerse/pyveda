@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyveda.gpu.backend import GPURuntime
+from vedart.gpu.backend import GPURuntime
 
 
 def test_gpu_runtime_creation():

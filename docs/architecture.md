@@ -1,10 +1,10 @@
-# PyVeda Architecture
+# VedaRT Architecture
 
-Understanding PyVeda's internal design and components.
+Understanding VedaRT's internal design and components.
 
 ## Overview
 
-PyVeda is a unified Python parallel runtime that combines the best features of multiple execution models (threads, processes, async, GPU) with intelligent scheduling and comprehensive observability.
+VedaRT is a unified Python parallel runtime that combines the best features of multiple execution models (threads, processes, async, GPU) with intelligent scheduling and comprehensive observability.
 
 ## Core Components
 
@@ -35,7 +35,7 @@ PyVeda is a unified Python parallel runtime that combines the best features of m
 
 ## Scheduler
 
-The **Adaptive Scheduler** is the brain of PyVeda, responsible for:
+The **Adaptive Scheduler** is the brain of VedaRT, responsible for:
 
 ### Responsibilities
 
@@ -94,7 +94,7 @@ Per-executor statistics:
 
 ## Executor Layer
 
-PyVeda supports four executor types:
+VedaRT supports four executor types:
 
 ### 1. ThreadPoolExecutor
 
@@ -355,7 +355,7 @@ Adaptive scheduler overhead: ~5-10 μs per task
 
 ## Concurrency Model
 
-PyVeda uses a hybrid approach:
+VedaRT uses a hybrid approach:
 
 1. **Work Stealing** - Future enhancement for load balancing
 2. **Task Queues** - Priority-based task scheduling
