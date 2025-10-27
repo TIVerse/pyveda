@@ -129,7 +129,7 @@ print(f"P99 Latency: {snapshot.p99_latency_ms:.2f}ms")
 
 ## Community
 
-- **GitHub**: [https://github.com/yourusername/vedart](https://github.com/yourusername/vedart)
+- **GitHub**: [https://github.com/TIVerse/vedart](https://github.com/TIVerse/vedart)
 - **Issues**: Report bugs and request features
 - **Discussions**: Ask questions and share ideas
 

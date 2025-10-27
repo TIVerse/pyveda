@@ -37,12 +37,12 @@ dev = [
     "ruff>=0.1.6",
     "black>=23.11.0",
 ]
-all = ["pyveda[gpu,telemetry,dev]"]
+all = ["vedart[gpu,telemetry,dev]"]
 
 [project.urls]
-Homepage = "https://github.com/vedxyz/pyveda"
-Documentation = "https://pyveda.readthedocs.io"
-Repository = "https://github.com/vedxyz/pyveda"
+Homepage = "https://github.com/TIVerse/vedart"
+Documentation = "https://vedart.readthedocs.io"
+Repository = "https://github.com/TIVerse/vedart"
 
 [tool.setuptools.packages.find]
 where = ["src"]
