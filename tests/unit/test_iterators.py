@@ -89,3 +89,59 @@ def test_par_iter_to_dict(cleanup_runtime):
     """Test conversion to dictionary."""
     result = par_iter([1, 2, 3]).to_dict(_to_string_key)
     assert result == {"1": 1, "2": 2, "3": 3}
+
+
+def test_par_iter_enumerate(cleanup_runtime):
+    """Test enumerate returns sequential indices, not IDs."""
+    result = par_iter(["a", "b", "c"]).enumerate().collect()
+    assert result == [(0, "a"), (1, "b"), (2, "c")]
+    
+    # Test with larger dataset
+    result = par_iter(range(10)).enumerate().collect()
+    expected = [(i, i) for i in range(10)]
+    assert result == expected
+
+
+def test_par_iter_chunk_preserves_boundaries(cleanup_runtime):
+    """Test chunk() + collect() preserves chunk boundaries."""
+    result = par_iter(range(10)).chunk(3).collect()
+    assert result == [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+    
+    # Test with exact multiple
+    result = par_iter(range(9)).chunk(3).collect()
+    assert result == [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+    
+    # Test with larger chunk size
+    result = par_iter(range(5)).chunk(10).collect()
+    assert result == [[0, 1, 2, 3, 4]]
+
+
+def test_par_iter_chunk_with_operations(cleanup_runtime):
+    """Test chunk() works with operations."""
+    result = par_iter(range(10)).map(_double).chunk(3).collect()
+    assert result == [[0, 2, 4], [6, 8, 10], [12, 14, 16], [18]]
+
+
+def test_par_iter_async_map(cleanup_runtime):
+    """Test async_map uses async executor properly."""
+    import asyncio
+    
+    async def async_double(x):
+        """Async function that doubles a value."""
+        await asyncio.sleep(0.001)  # Small delay
+        return x * 2
+    
+    # async_map should handle async functions
+    result = par_iter([1, 2, 3, 4, 5]).async_map(async_double).collect()
+    assert result == [2, 4, 6, 8, 10]
+    
+    # Test with larger dataset to ensure no per-item loop creation
+    result = par_iter(range(20)).async_map(async_double).collect()
+    assert result == [i * 2 for i in range(20)]
+
+
+def test_par_iter_async_map_with_regular_function(cleanup_runtime):
+    """Test async_map converts regular functions to async."""
+    # Regular function should be wrapped as async
+    result = par_iter([1, 2, 3]).async_map(_double).collect()
+    assert result == [2, 4, 6]
