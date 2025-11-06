@@ -86,3 +86,41 @@ def test_metrics_snapshot_json():
     assert json_output["tasks"]["executed"] == 100
     assert json_output["latency_ms"]["avg"] == 10.5
     assert json_output["system"]["cpu_percent"] == 65.0
+
+
+def test_scheduler_records_histogram_latencies(cleanup_runtime):
+    """Test that scheduler records task latencies to telemetry histogram."""
+    import vedart as veda
+    
+    # Initialize with telemetry enabled
+    config = veda.Config.builder().telemetry(True).threads(2).build()
+    veda.init(config)
+    
+    runtime = veda.get_runtime()
+    assert runtime.telemetry is not None
+    
+    # Initial histogram should be empty or have very few samples
+    initial_count = runtime.telemetry.latency_histogram.get_count()
+    
+    # Run some tasks
+    result = veda.par_iter(range(50)).map(lambda x: x * 2).collect()
+    assert len(result) == 50
+    
+    # Histogram should now have recorded latencies
+    final_count = runtime.telemetry.latency_histogram.get_count()
+    assert final_count > initial_count
+    
+    # Percentiles should be non-zero
+    p50 = runtime.telemetry.latency_histogram.get_percentile(50)
+    p95 = runtime.telemetry.latency_histogram.get_percentile(95)
+    p99 = runtime.telemetry.latency_histogram.get_percentile(99)
+    
+    assert p50 > 0
+    assert p95 >= p50
+    assert p99 >= p95
+    
+    # Snapshot should reflect the recorded data
+    snapshot = runtime.telemetry.snapshot()
+    assert snapshot.p50_latency_ms > 0
+    assert snapshot.p95_latency_ms > 0
+    assert snapshot.p99_latency_ms > 0
