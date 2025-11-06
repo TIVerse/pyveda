@@ -41,7 +41,7 @@ jobs:
         python benchmarks/scaling_benchmark.py
     
     - name: Save benchmark results
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master'
       run: |
         mkdir -p benchmark-results
         echo "Benchmark run: $(date)" > benchmark-results/latest.txt
@@ -49,7 +49,7 @@ jobs:
         python benchmarks/scaling_benchmark.py > benchmark-results/scaling.txt
     
     - name: Upload benchmark artifacts
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master'
       uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
