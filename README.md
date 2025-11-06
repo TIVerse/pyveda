@@ -82,13 +82,15 @@ import vedart as veda
 # Your parallel work
 result = veda.par_iter(data).map(process).collect()
 
-# Get metrics
-metrics = veda.telemetry.snapshot()
-print(f"Tasks executed: {metrics.tasks_executed}")
-print(f"Avg latency: {metrics.avg_latency_ms}ms")
-
-# Export to Prometheus
-metrics.export_prometheus()  # Ready for Grafana
+# Get metrics (requires telemetry enabled in config)
+runtime = veda.get_runtime()
+if runtime.telemetry:
+    metrics = runtime.telemetry.snapshot()
+    print(f"Tasks executed: {metrics.tasks_executed}")
+    print(f"Avg latency: {metrics.avg_latency_ms}ms")
+    
+    # Export to Prometheus
+    metrics.export_prometheus()  # Ready for Grafana
 ```
 
 ### 🔬 Deterministic Debugging
@@ -277,18 +279,20 @@ import vedart as veda
 # Run your workload
 result = veda.par_iter(data).map(process).collect()
 
-# Get metrics snapshot
-metrics = veda.telemetry.snapshot()
-
-print(f"Tasks executed: {metrics.tasks_executed}")
-print(f"Tasks failed: {metrics.tasks_failed}")
-print(f"Avg latency: {metrics.avg_latency_ms}ms")
-print(f"P99 latency: {metrics.p99_latency_ms}ms")
-print(f"CPU usage: {metrics.cpu_utilization_percent}%")
-
-# Export formats
-metrics.export_json()        # JSON format
-metrics.export_prometheus()  # Prometheus format
+# Get metrics snapshot (requires telemetry enabled)
+runtime = veda.get_runtime()
+if runtime.telemetry:
+    metrics = runtime.telemetry.snapshot()
+    
+    print(f"Tasks executed: {metrics.tasks_executed}")
+    print(f"Tasks failed: {metrics.tasks_failed}")
+    print(f"Avg latency: {metrics.avg_latency_ms}ms")
+    print(f"P99 latency: {metrics.p99_latency_ms}ms")
+    print(f"CPU usage: {metrics.cpu_utilization_percent}%")
+    
+    # Export formats
+    metrics.export_json()        # JSON format
+    metrics.export_prometheus()  # Prometheus format
 ```
 
 ### Deterministic Mode
