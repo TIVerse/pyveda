@@ -83,6 +83,35 @@ class FlatMapOp(Operation):
         return result
 
 
+class AsyncMapOp(Operation):
+    """Async map operation that runs async functions in sync context."""
+
+    def __init__(self, func: Callable[[Any], Any]) -> None:
+        self.func = func
+
+    def apply(self, items: list[Any]) -> list[Any]:
+        """Apply async function to items by running each in a new event loop."""
+        import asyncio
+        import inspect
+        
+        results = []
+        for item in items:
+            if inspect.iscoroutinefunction(self.func):
+                # Run async function
+                try:
+                    result = asyncio.run(self.func(item))
+                except RuntimeError:
+                    # If there's already an event loop, this shouldn't happen in worker processes
+                    # But as a fallback, just call the function and it will return a coroutine
+                    coro = self.func(item)
+                    result = asyncio.get_event_loop().run_until_complete(coro)
+                results.append(result)
+            else:
+                # Regular function
+                results.append(self.func(item))
+        return results
+
+
 class ParallelIterator(Generic[T]):
     """Rayon-inspired parallel iterator.
 
@@ -115,6 +144,7 @@ class ParallelIterator(Generic[T]):
         self._chunk_size = chunk_size
         self._ordered = ordered
         self._operations: list[Operation] = []
+        self._preserve_chunks = False  # Flag to preserve chunk boundaries in collect()
 
     def map(self, func: Callable[[T], U]) -> "ParallelIterator[U]":
         """Apply function to each element in parallel.
@@ -131,6 +161,7 @@ class ParallelIterator(Generic[T]):
             self._ordered,
         )
         new_iter._operations = self._operations + [MapOp(func)]
+        new_iter._preserve_chunks = self._preserve_chunks
         return new_iter
 
     def filter(self, predicate: Callable[[T], bool]) -> "ParallelIterator[T]":
@@ -148,6 +179,7 @@ class ParallelIterator(Generic[T]):
             self._ordered,
         )
         new_iter._operations = self._operations + [FilterOp(predicate)]
+        new_iter._preserve_chunks = self._preserve_chunks
         return new_iter
 
     def flat_map(self, func: Callable[[T], Iterable[U]]) -> "ParallelIterator[U]":
@@ -165,6 +197,7 @@ class ParallelIterator(Generic[T]):
             self._ordered,
         )
         new_iter._operations = self._operations + [FlatMapOp(func)]
+        new_iter._preserve_chunks = self._preserve_chunks
         return new_iter
 
     def enumerate(self) -> "ParallelIterator[tuple[int, T]]":
@@ -173,7 +206,12 @@ class ParallelIterator(Generic[T]):
         Returns:
             New iterator with (index, element) tuples
         """
-        return self.map(lambda item: (id(item), item))  # Simplified enumeration
+        # Materialize with sequential indices before applying operations
+        items = list(self._iterable)
+        enumerated = [(idx, item) for idx, item in enumerate(items)]
+        new_iter = ParallelIterator(enumerated, self._chunk_size, self._ordered)
+        new_iter._operations = self._operations.copy()
+        return new_iter
 
     def zip(self, other: Iterable[U]) -> "ParallelIterator[tuple[T, U]]":
         """Zip with another iterable.
@@ -233,6 +271,7 @@ class ParallelIterator(Generic[T]):
         chunks = [items[i : i + size] for i in range(0, len(items), size)]
         new_iter = ParallelIterator(chunks, self._chunk_size, self._ordered)
         new_iter._operations = self._operations.copy()
+        new_iter._preserve_chunks = True  # Set flag to preserve chunks in collect()
         return new_iter
 
     def gpu_map(self, func: Callable[[T], U]) -> "ParallelIterator[U]":
@@ -259,27 +298,15 @@ class ParallelIterator(Generic[T]):
         Returns:
             New iterator with async map
         """
-        # Create async-aware wrapper
-        import asyncio
-        import inspect
-
-        if not inspect.iscoroutinefunction(func):
-            # Convert to async
-            async def async_wrapper(x: T) -> U:
-                return func(x)
-
-            func = async_wrapper
-
-        # Execute async functions via runtime
-        def sync_wrapper(x: T) -> U:
-            loop = asyncio.new_event_loop()
-            try:
-                result = loop.run_until_complete(func(x))
-                return result
-            finally:
-                loop.close()
-
-        return self.map(sync_wrapper)
+        # Use AsyncMapOp which handles async execution in worker processes
+        new_iter = ParallelIterator(
+            self._iterable,
+            self._chunk_size,
+            self._ordered,
+        )
+        new_iter._operations = self._operations + [AsyncMapOp(func)]
+        new_iter._preserve_chunks = self._preserve_chunks
+        return new_iter
 
     def collect(self) -> list[T]:
         """Execute pipeline and collect results.
@@ -296,6 +323,30 @@ class ParallelIterator(Generic[T]):
         if not items:
             return []
 
+        # If preserve_chunks is set, items ARE the chunks - process each as a unit
+        if self._preserve_chunks:
+            # Each item is already a chunk, process them directly without re-chunking
+            futures = []
+            for idx, chunk in enumerate(items):
+                task = Task(
+                    func=_process_chunk_with_ops,
+                    args=(chunk, self._operations, idx),
+                    kwargs={},
+                )
+                future = runtime.scheduler.submit(task)
+                futures.append(future)
+            
+            # Collect results
+            results = [f.result() for f in futures]
+            
+            # Preserve order
+            if self._ordered:
+                results.sort(key=lambda x: x[0])
+            
+            # Return the processed chunks directly
+            return [chunk_result for _, chunk_result in results]
+
+        # Normal path: chunk for parallel processing, then flatten
         chunk_size = self._chunk_size or self._auto_chunk_size(len(items))
         chunks = self._chunk_iterable(items, chunk_size)
 
@@ -313,10 +364,11 @@ class ParallelIterator(Generic[T]):
         # Collect results
         results = [f.result() for f in futures]
 
-        # Flatten and optionally preserve order
+        # Optionally preserve order
         if self._ordered:
             results.sort(key=lambda x: x[0])  # Sort by chunk index
-
+        
+        # Flatten results
         flattened = []
         for _, chunk_result in results:
             flattened.extend(chunk_result)
