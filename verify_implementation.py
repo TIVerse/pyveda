@@ -38,10 +38,10 @@ def main() -> int:
     # Test 1: Basic imports
     test_section("Basic Imports")
     try:
-        import pyveda as veda
-        success("Import pyveda")
+        import vedart as veda
+        success("Import vedart")
     except Exception as e:
-        failure("Import pyveda", e)
+        failure("Import vedart", e)
         failures.append("imports")
         return 1
     
@@ -123,7 +123,7 @@ def main() -> int:
             await asyncio.sleep(0.001)
             return x * 2
         
-        from pyveda.core.task import Task
+        from vedart.core.task import Task
         task = Task(func=async_func, args=(5,))
         assert task.is_async is True
         success("Async function auto-detection")
@@ -154,7 +154,7 @@ def main() -> int:
             
             # Test exports
             prom_text = snapshot.export_prometheus()
-            assert 'pyveda_tasks_executed_total' in prom_text
+            assert 'veda_tasks_executed_total' in prom_text
             success("Prometheus export")
             
             json_data = snapshot.export_json()
@@ -172,7 +172,7 @@ def main() -> int:
     # Test 6: Deterministic Execution
     test_section("Deterministic Execution")
     try:
-        from pyveda.deterministic.replay import deterministic, ExecutionTrace
+        from vedart.deterministic.replay import deterministic, ExecutionTrace
         
         # Test with recording
         with deterministic(seed=42, record=True) as trace:
@@ -231,7 +231,7 @@ def main() -> int:
     # Test 8: Tracing System
     test_section("Tracing System")
     try:
-        from pyveda.telemetry import TracingSystem
+        from vedart.telemetry import TracingSystem
         
         tracing = TracingSystem()
         
@@ -260,7 +260,7 @@ def main() -> int:
     # Test 9: Exporters
     test_section("Exporters")
     try:
-        from pyveda.telemetry import create_exporter
+        from vedart.telemetry import create_exporter
         
         # Create different exporters
         prom_exporter = create_exporter('prometheus', namespace='test')
