@@ -87,10 +87,16 @@ def test_gpu_execute_fallback():
     assert result == 10
 
 
-@pytest.mark.skipif(True, reason="Requires CuPy installation")
 def test_gpu_memory_pool_initialization():
     """Test GPU memory pool is initialized with CuPy."""
     gpu = GPURuntime()
 
     if gpu.backend == "cupy" and gpu.is_available():
+        # Memory pool should be initialized
         assert gpu.memory_pool is not None
+        # Pool should expose malloc method
+        assert hasattr(gpu.memory_pool, 'malloc')
+        assert gpu.memory_pool.malloc is not None
+    else:
+        # If no CuPy backend, pool should be None
+        pytest.skip("CuPy backend not available")
